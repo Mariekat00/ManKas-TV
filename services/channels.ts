@@ -51,8 +51,21 @@ export async function getChannels() {
     .select("*")
     .order("name", { ascending: true });
 
-  if (error) {
-    throw new Error(error.message);
+  if (error || !data || data.length === 0) {
+    try {
+      const response = await fetch("/api/channels");
+      if (response.ok) {
+        const apiData = await response.json();
+        channelCache = {
+          expiresAt: Date.now() + CHANNEL_CACHE_TTL,
+          data: apiData.channels,
+        };
+        return channelCache.data;
+      }
+    } catch {
+      // fallback failed
+    }
+    if (error) throw new Error(error.message);
   }
 
   channelCache = {
@@ -86,17 +99,21 @@ export async function getCategories() {
     return mockCategories;
   }
 
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("categories")
-    .select("*")
-    .order("name", { ascending: true });
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name", { ascending: true });
 
-  if (error) {
-    throw new Error(error.message);
+    if (error || !data || data.length === 0) {
+      return mockCategories;
+    }
+
+    return (data ?? []) as Category[];
+  } catch {
+    return mockCategories;
   }
-
-  return (data ?? []) as Category[];
 }
 
 export async function addFavorite(channelId: string) {
@@ -157,22 +174,26 @@ export async function getFavorites() {
     return [...mockFavorites];
   }
 
-  const supabase = getSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = getSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return [];
+    if (!user) {
+      return [...mockFavorites];
+    }
+
+    const { data, error } = await supabase.from("favorites").select("channel_id").eq("user_id", user.id);
+
+    if (error) {
+      return [...mockFavorites];
+    }
+
+    return (data ?? []).map((favorite) => favorite.channel_id);
+  } catch {
+    return [...mockFavorites];
   }
-
-  const { data, error } = await supabase.from("favorites").select("channel_id").eq("user_id", user.id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []).map((favorite) => favorite.channel_id);
 }
 
 export async function addWatchHistory(channelId: string) {
@@ -220,27 +241,31 @@ export async function getWatchHistory() {
     });
   }
 
-  const supabase = getSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = getSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
+    if (!user) {
+      return [] as WatchHistory[];
+    }
+
+    const { data, error } = await supabase
+      .from("watch_history")
+      .select("*, channels(*)")
+      .eq("user_id", user.id)
+      .order("watched_at", { ascending: false })
+      .limit(12);
+
+    if (error) {
+      return [] as WatchHistory[];
+    }
+
+    return (data ?? []) as WatchHistory[];
+  } catch {
     return [] as WatchHistory[];
   }
-
-  const { data, error } = await supabase
-    .from("watch_history")
-    .select("*, channels(*)")
-    .eq("user_id", user.id)
-    .order("watched_at", { ascending: false })
-    .limit(12);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return (data ?? []) as WatchHistory[];
 }
 
 export async function createChannel(payload: ChannelInsert) {
