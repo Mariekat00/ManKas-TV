@@ -1,16 +1,16 @@
 import { getSupabaseClient } from "@/lib/supabaseClient";
 import { isSupabaseConfigured } from "@/lib/mockData";
 
-export async function signInWithEmail(email: string) {
+export async function signInWithGoogle() {
   if (!isSupabaseConfigured()) {
-    return;
+    throw new Error("Supabase not configured.");
   }
 
   const supabase = getSupabaseClient();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
     options: {
-      emailRedirectTo:
+      redirectTo:
         typeof window === "undefined" ? undefined : `${window.location.origin}/`,
     },
   });
@@ -31,4 +31,20 @@ export async function signOut() {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function getCurrentUser() {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
+export function isAdminEmail(email: string | undefined | null): boolean {
+  if (!email) return false;
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  return !!adminEmail && email.toLowerCase() === adminEmail.toLowerCase();
 }
