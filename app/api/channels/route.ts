@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
 import type { Channel } from "@/types";
 
-let cachedChannels: Channel[] | null = null;
-
 export async function GET() {
-  if (cachedChannels) {
-    return NextResponse.json({ channels: cachedChannels });
-  }
-
   const channels: Channel[] = [
     // ── Spain ──
     {
@@ -249,7 +243,7 @@ export async function GET() {
     },
   ];
 
-  cachedChannels = channels;
-
-  return NextResponse.json({ channels: cachedChannels });
+  return NextResponse.json({ channels }, {
+    headers: { "Cache-Control": "no-store" },
+  });
 }
