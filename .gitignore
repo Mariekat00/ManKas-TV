@@ -47,3 +47,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Flutter/Android secrets
+mankas_tv/android/app/google-services.json
+mankas_tv/android/app/client_secret*.json

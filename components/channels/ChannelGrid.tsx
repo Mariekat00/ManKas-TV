@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Heart, Play, RadioTower } from "lucide-react";
 import { addFavorite, addWatchHistory, removeFavorite } from "@/services/channels";
@@ -46,6 +47,7 @@ export function ChannelGrid({
 }
 
 function ChannelCard({ channel }: { channel: Channel }) {
+  const router = useRouter();
   const favorites = useTvStore((state) => state.favorites);
   const setSelectedChannel = useTvStore((state) => state.setSelectedChannel);
   const toggleFavoriteLocal = useTvStore((state) => state.toggleFavoriteLocal);
@@ -54,6 +56,7 @@ function ChannelCard({ channel }: { channel: Channel }) {
   async function selectChannel() {
     setSelectedChannel(channel);
     await addWatchHistory(channel.id).catch(() => undefined);
+    router.push(`/channels/${channel.id}`);
   }
 
   async function toggleFavorite() {

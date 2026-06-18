@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 import { parseM3U } from "@/lib/m3u";
 import type { ChannelInsert } from "@/types";
 
@@ -26,7 +27,11 @@ function chunkArray<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  if (!(await verifyAdminAuth(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const playlistPath = path.join(process.cwd(), "IPTV", "playlist.m3u8");
 
   let playlistText: string;

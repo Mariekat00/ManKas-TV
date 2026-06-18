@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabaseAdmin";
+import { verifyAdminAuth } from "@/lib/adminAuth";
 import type { ChannelInsert } from "@/types";
 
 export async function POST(request: Request) {
+  if (!(await verifyAdminAuth(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const payload = (await request.json()) as ChannelInsert;
     const supabase = getSupabaseAdminClient();
@@ -26,6 +31,10 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!(await verifyAdminAuth(request))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { id } = (await request.json()) as { id?: string };
 

@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient, getAuthHeaders } from "@/lib/supabaseClient";
 import {
   isSupabaseConfigured,
   mockCategories,
@@ -285,9 +285,10 @@ export async function createChannel(payload: ChannelInsert) {
     return newChannel;
   }
 
+  const authHeaders = await getAuthHeaders();
   const response = await fetch("/api/admin/channels", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify(payload),
   });
 
@@ -306,9 +307,10 @@ export async function importIptvPlaylist() {
     throw new Error("Supabase is not configured for import.");
   }
 
+  const authHeaders = await getAuthHeaders();
   const response = await fetch("/api/admin/import-iptv", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
   });
 
   const body = (await response.json()) as { imported?: number; total?: number; error?: string };
@@ -329,9 +331,10 @@ export async function deleteChannel(id: string) {
     return;
   }
 
+  const authHeaders = await getAuthHeaders();
   const response = await fetch("/api/admin/channels", {
     method: "DELETE",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify({ id }),
   });
 

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Clock3 } from "lucide-react";
 import { getWatchHistory } from "@/services/channels";
 import { useTvStore } from "@/store/useTvStore";
 import type { WatchHistory } from "@/types";
 
 export function RecentlyWatched() {
+  const router = useRouter();
   const [items, setItems] = useState<WatchHistory[]>([]);
   const setSelectedChannel = useTvStore((state) => state.setSelectedChannel);
 
@@ -42,7 +44,10 @@ export function RecentlyWatched() {
             <button
               key={item.id}
               type="button"
-              onClick={() => setSelectedChannel(item.channels ?? null)}
+              onClick={() => {
+                setSelectedChannel(item.channels ?? null);
+                router.push(`/channels/${item.channels!.id}`);
+              }}
               className="min-w-52 rounded-md border border-border bg-panel p-3 text-left transition hover:border-accent"
             >
               <div className="truncate font-medium">{item.channels.name}</div>
