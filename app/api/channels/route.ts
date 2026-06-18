@@ -175,6 +175,16 @@ export async function GET() {
       language: "Spanish",
       created_at: new Date().toISOString(),
     },
+    {
+      id: "bein-sports-1",
+      name: "beIN Sports 1",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/BeIN_Sports_logo_%28vertical_version%29.svg/500px-BeIN_Sports_logo_%28vertical_version%29.svg.png",
+      stream_url: "http://23.237.104.106:8080/USA_BEIN/index.m3u8",
+      category: "Sports",
+      country: "USA",
+      language: "English",
+      created_at: new Date().toISOString(),
+    },
     // ── More Free Sports ──
     {
       id: "30a-golf",

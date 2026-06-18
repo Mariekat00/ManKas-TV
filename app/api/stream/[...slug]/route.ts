@@ -20,6 +20,8 @@ const ALLOWED_HOSTS = [
   "twitch.tv",
   "jwpcdn.com",
   "jwpltx.com",
+  "amagi.tv",
+  "23.237.104.106",
 ];
 
 function isAllowedHost(host: string): boolean {
