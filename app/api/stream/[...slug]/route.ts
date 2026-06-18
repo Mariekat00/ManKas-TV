@@ -22,6 +22,23 @@ const ALLOWED_HOSTS = [
   "jwpltx.com",
   "amagi.tv",
   "23.237.104.106",
+  // World Cup 2026 broadcasters
+  "queazified.co.uk",
+  "canlitvapp.com",
+  "80.194.62.172",
+  "151.80.18.177",
+  "adriatelekom.com",
+  "ard-mcdn.de",
+  "138.121.15.230",
+  "thetvapp.to",
+  "38.75.136.137",
+  "tvsen7.aynaott.com",
+  "190.11.225.124",
+  "162.19.255.233",
+  "mcdn.br.de",
+  "hopslan.com",
+  "filegear-sg.me",
+  "daserste-live.ard-mcdn.de",
 ];
 
 function isAllowedHost(host: string): boolean {
