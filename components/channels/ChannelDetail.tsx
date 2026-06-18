@@ -17,6 +17,7 @@ export function ChannelDetail({ channelId }: { channelId: string }) {
   const isFavorite = channel ? favorites.includes(channel.id) : false;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     let isMounted = true;
 
     getChannel(channelId)
