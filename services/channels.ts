@@ -24,20 +24,23 @@ export async function getChannels() {
     return channelCache.data;
   }
 
-  if (!isSupabaseConfigured()) {
-    try {
-      const response = await fetch("/api/channels");
-      if (response.ok) {
-        const data = await response.json();
+  try {
+    const response = await fetch("/api/channels");
+    if (response.ok) {
+      const data = await response.json();
+      if (data.channels && data.channels.length > 0) {
         channelCache = {
           expiresAt: Date.now() + CHANNEL_CACHE_TTL,
           data: data.channels,
         };
         return channelCache.data;
       }
-    } catch {
-      // Fallback to mock channels if API fails
     }
+  } catch {
+    // fallback below
+  }
+
+  if (!isSupabaseConfigured()) {
     channelCache = {
       expiresAt: Date.now() + CHANNEL_CACHE_TTL,
       data: [...mockChannels],
@@ -51,28 +54,18 @@ export async function getChannels() {
     .select("*")
     .order("name", { ascending: true });
 
-  if (error || !data || data.length === 0) {
-    try {
-      const response = await fetch("/api/channels");
-      if (response.ok) {
-        const apiData = await response.json();
-        channelCache = {
-          expiresAt: Date.now() + CHANNEL_CACHE_TTL,
-          data: apiData.channels,
-        };
-        return channelCache.data;
-      }
-    } catch {
-      // fallback failed
-    }
-    if (error) throw new Error(error.message);
+  if (!error && data && data.length > 0) {
+    channelCache = {
+      expiresAt: Date.now() + CHANNEL_CACHE_TTL,
+      data: data,
+    };
+    return channelCache.data;
   }
 
   channelCache = {
     expiresAt: Date.now() + CHANNEL_CACHE_TTL,
-    data: data ?? [],
+    data: [...mockChannels],
   };
-
   return channelCache.data;
 }
 
