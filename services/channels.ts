@@ -84,14 +84,24 @@ export async function getChannel(id: string) {
     return channel;
   }
 
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase.from("channels").select("*").eq("id", id).single();
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.from("channels").select("*").eq("id", id).single();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error || !data) {
+      const channels = await getChannels();
+      const channel = channels.find((ch) => ch.id === id);
+      if (!channel) throw new Error("Channel not found.");
+      return channel;
+    }
+
+    return data;
+  } catch {
+    const channels = await getChannels();
+    const channel = channels.find((ch) => ch.id === id);
+    if (!channel) throw new Error("Channel not found.");
+    return channel;
   }
-
-  return data;
 }
 
 export async function getCategories() {
