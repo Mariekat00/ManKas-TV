@@ -11,6 +11,8 @@ export function useChannels() {
   const query = useTvStore((state) => state.query);
   const category = useTvStore((state) => state.category);
   const country = useTvStore((state) => state.country);
+  const showFavoritesOnly = useTvStore((state) => state.showFavoritesOnly);
+  const favorites = useTvStore((state) => state.favorites);
   const setChannels = useTvStore((state) => state.setChannels);
   const setFavorites = useTvStore((state) => state.setFavorites);
 
@@ -57,10 +59,11 @@ export function useChannels() {
 
       const matchesCategory = category === "All" || channel.category === category;
       const matchesCountry = country === "All" || channel.country === country;
+      const matchesFavorites = !showFavoritesOnly || favorites.includes(channel.id);
 
-      return matchesSearch && matchesCategory && matchesCountry;
+      return matchesSearch && matchesCategory && matchesCountry && matchesFavorites;
     });
-  }, [category, channels, country, query]);
+  }, [category, channels, country, query, showFavoritesOnly, favorites]);
 
   return {
     channels,

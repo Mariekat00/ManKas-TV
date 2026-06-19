@@ -19,6 +19,7 @@ type TvState = {
   category: string;
   country: string;
   favorites: string[];
+  showFavoritesOnly: boolean;
   playerStatus: PlayerStatus;
   theme: Theme;
   sidebarOpen: boolean;
@@ -29,6 +30,7 @@ type TvState = {
   setCategory: (category: string) => void;
   setCountry: (country: string) => void;
   setFavorites: (favorites: string[]) => void;
+  toggleShowFavoritesOnly: () => void;
   toggleFavoriteLocal: (channelId: string) => void;
   setPlayerStatus: (status: PlayerStatus) => void;
   toggleTheme: () => void;
@@ -43,6 +45,7 @@ export const useTvStore = create<TvState>((set) => ({
   category: "All",
   country: "All",
   favorites: [],
+  showFavoritesOnly: false,
   playerStatus: "idle",
   theme: getInitialTheme(),
   sidebarOpen: false,
@@ -53,6 +56,7 @@ export const useTvStore = create<TvState>((set) => ({
   setCategory: (category) => set({ category }),
   setCountry: (country) => set({ country }),
   setFavorites: (favorites) => set({ favorites }),
+  toggleShowFavoritesOnly: () => set((state) => ({ showFavoritesOnly: !state.showFavoritesOnly })),
   toggleFavoriteLocal: (channelId) =>
     set((state) => ({
       favorites: state.favorites.includes(channelId)

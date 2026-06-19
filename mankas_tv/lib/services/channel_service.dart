@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/channel.dart';
-import 'm3u_parser.dart';
 
 class ChannelService {
   static const _favoritesKey = 'favorites';
-  static const _cacheKey = 'channels_cache_v2';
+  static const _cacheKey = 'channels_cache_v3';
 
   static const guaranteedChannels = [
     // ── Spain ──
@@ -335,34 +333,7 @@ class ChannelService {
   ];
 
   Future<List<Channel>> getChannels() async {
-    final cached = await _loadCachedChannels();
-    if (cached.isNotEmpty) return cached;
-
-    final channels = List<Channel>.from(guaranteedChannels);
-
-    try {
-      final response = await http.get(Uri.parse('https://iptv-org.github.io/iptv/countries/es.m3u'));
-      if (response.statusCode == 200) {
-        final parsed = M3uParser.parse(response.body);
-        for (var i = 0; i < parsed.length; i++) {
-          final ch = parsed[i];
-          if (ch.streamUrl.endsWith('.m3u8') || ch.streamUrl.contains('.m3u8?')) {
-            channels.add(Channel(
-              id: 'iptv-$i',
-              name: ch.name,
-              logo: ch.logo,
-              streamUrl: ch.streamUrl,
-              category: ch.category,
-              country: ch.country,
-              language: ch.language,
-            ));
-          }
-        }
-      }
-    } catch (_) {}
-
-    await _cacheChannels(channels);
-    return channels;
+    return List<Channel>.from(guaranteedChannels);
   }
 
   Future<List<String>> getFavorites() async {

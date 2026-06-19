@@ -12,6 +12,7 @@ class TvProvider extends ChangeNotifier {
   String _query = '';
   String _category = 'All';
   String _country = 'All';
+  bool _showFavoritesOnly = false;
   bool _isLoading = true;
 
   List<Channel> get channels => _channels;
@@ -21,6 +22,7 @@ class TvProvider extends ChangeNotifier {
   String get query => _query;
   String get category => _category;
   String get country => _country;
+  bool get showFavoritesOnly => _showFavoritesOnly;
   bool get isLoading => _isLoading;
 
   Set<String> get categories => _channels.map((c) => c.category ?? 'General').toSet();
@@ -65,6 +67,12 @@ class TvProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleFavoritesOnly() {
+    _showFavoritesOnly = !_showFavoritesOnly;
+    _applyFilters();
+    notifyListeners();
+  }
+
   Future<void> toggleFavorite(String channelId) async {
     await _service.toggleFavorite(channelId);
     _favorites = await _service.getFavorites();
@@ -82,7 +90,8 @@ class TvProvider extends ChangeNotifier {
           (ch.language?.toLowerCase().contains(q) ?? false);
       final matchesCategory = _category == 'All' || ch.category == _category;
       final matchesCountry = _country == 'All' || ch.country == _country;
-      return matchesSearch && matchesCategory && matchesCountry;
+      final matchesFavorites = !_showFavoritesOnly || _favorites.contains(ch.id);
+      return matchesSearch && matchesCategory && matchesCountry && matchesFavorites;
     }).toList();
   }
 }
