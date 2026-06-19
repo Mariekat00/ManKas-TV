@@ -62,7 +62,6 @@ flutter build windows  # Build Windows
 | Equidia | France | French | GitHub HLS |
 | Trace Sport Stars | France | French | Amagi CDN HLS |
 | FTF Sports | France | French | CDN77 HLS |
-| M6 | France | French | 6cloud.fr HLS |
 | Telemundo NY | USA | Spanish | akamized.net HLS |
 | Alkass One | Qatar | Arabic | GCP HLS |
 | Alkass Two | Qatar | Arabic | GCP HLS |
