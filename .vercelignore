@@ -1,0 +1,6 @@
+node_modules
+mankas_tv
+.git
+*.apk
+public/data/iptv_channels.json
+build_channels_ts.js
