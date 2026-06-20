@@ -3,8 +3,11 @@ import '../../models/football_match.dart';
 
 class GroupStandings extends StatelessWidget {
   final List<FootballGroup> groups;
+  final Map<String, String> teamNames;
 
-  const GroupStandings({super.key, required this.groups});
+  const GroupStandings({super.key, required this.groups, this.teamNames = const {}});
+
+  String _getName(String teamId) => teamNames[teamId] ?? 'Team #$teamId';
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +69,7 @@ class GroupStandings extends StatelessWidget {
                       }),
                       cells: [
                         DataCell(Text('${i + 1}', style: const TextStyle(fontSize: 12, color: Colors.white54))),
-                        DataCell(Text(team.teamName, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500))),
+                        DataCell(Text(_getName(team.teamId), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500))),
                         DataCell(Text('${team.played}', style: const TextStyle(fontSize: 12))),
                         DataCell(Text('${team.win}', style: const TextStyle(fontSize: 12))),
                         DataCell(Text('${team.draw}', style: const TextStyle(fontSize: 12))),

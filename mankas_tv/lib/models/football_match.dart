@@ -143,15 +143,15 @@ class FootballGroupTeam {
 
   factory FootballGroupTeam.fromJson(Map<String, dynamic> json) {
     return FootballGroupTeam(
-      teamId: json['team_id']?.toString() ?? '',
-      teamName: json['team_name_en']?.toString() ?? '',
-      played: _parseInt(json['played']),
-      win: _parseInt(json['win']),
-      draw: _parseInt(json['draw']),
-      loss: _parseInt(json['loss']),
-      goalsFor: _parseInt(json['goals_for']),
-      goalsAgainst: _parseInt(json['goals_against']),
-      points: _parseInt(json['points']),
+      teamId: (json['team_id'] ?? json['id'] ?? '').toString(),
+      teamName: (json['team_name_en'] ?? '').toString(),
+      played: _parseInt(json['mp'] ?? json['played']),
+      win: _parseInt(json['w'] ?? json['win']),
+      draw: _parseInt(json['d'] ?? json['draw']),
+      loss: _parseInt(json['l'] ?? json['loss']),
+      goalsFor: _parseInt(json['gf'] ?? json['goals_for']),
+      goalsAgainst: _parseInt(json['ga'] ?? json['goals_against']),
+      points: _parseInt(json['pts'] ?? json['points']),
     );
   }
 

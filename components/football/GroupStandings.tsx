@@ -1,14 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import type { FootballGroup } from "@/types";
+import type { FootballGroup, FootballTeam } from "@/types";
 
-export function GroupStandings({ groups }: { groups: FootballGroup[] }) {
+type Props = {
+  groups: FootballGroup[];
+  teams: Record<string, FootballTeam>;
+};
+
+function getTeamName(teamId: string, teams: Record<string, FootballTeam>): string {
+  return teams[teamId]?.name_en || `Team #${teamId}`;
+}
+
+function getTeamFlag(teamId: string, teams: Record<string, FootballTeam>): string {
+  const name = teams[teamId]?.name_en || "";
+  const flags: Record<string, string> = {
+    "Mexico": "🇲🇽", "South Korea": "🇰🇷", "Czech Republic": "🇨🇿",
+    "South Africa": "🇿🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭",
+    "Canada": "🇨🇦", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨",
+    "Germany": "🇩🇪", "Paraguay": "🇵🇾", "Australia": "🇦🇺",
+    "Turkey": "🇹🇷", "United States": "🇺🇸", "Japan": "🇯🇵",
+    "Sweden": "🇸🇪", "Tunisia": "🇹🇳", "Netherlands": "🇳🇱",
+    "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴", "France": "🇫🇷",
+    "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿", "Belgium": "🇧🇪",
+    "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾", "Spain": "🇪🇸",
+    "Panama": "🇵🇦", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭",
+    "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴", "Argentina": "🇦🇷",
+    "Colombia": "🇨🇴", "Portugal": "🇵🇹", "Morocco": "🇲🇦",
+    "Cameroon": "🇨🇲", "Serbia": "🇷🇸", "Poland": "🇵🇱",
+    "Brazil": "🇧🇷", "Italy": "🇮🇹", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+    "Denmark": "🇩🇰", "Greece": "🇬🇷", "Romania": "🇷🇴",
+    "Hungary": "🇭🇺", "Slovakia": "🇸🇰", "Ukraine": "🇺🇦",
+    "Bosnia and Herzegovina": "🇧🇦", "Haiti": "🇭🇹", "Curaçao": "🇨🇼",
+    "Cape Verde": "🇨🇻", "Austria": "🇦🇹", "Democratic Republic of the Congo": "🇨🇩",
+    "Uzbekistan": "🇺🇿", "Algeria": "🇩🇿",
+  };
+  return flags[name] || "🏳️";
+}
+
+export function GroupStandings({ groups, teams }: Props) {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   const filteredGroups = selectedGroup
     ? groups.filter((g) => g.name === selectedGroup)
     : groups;
+
+  const sorted = [...filteredGroups].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div>
@@ -24,7 +61,7 @@ export function GroupStandings({ groups }: { groups: FootballGroup[] }) {
         >
           Tous
         </button>
-        {groups.map((g) => (
+        {sorted.map((g) => (
           <button
             key={g.id || g.name}
             type="button"
@@ -41,45 +78,48 @@ export function GroupStandings({ groups }: { groups: FootballGroup[] }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        {filteredGroups.map((group) => (
-          <div
-            key={group.id || group.name}
-            className="overflow-hidden rounded-lg border border-border bg-panel"
-          >
-            <div className="flex items-center justify-between border-b border-border bg-panel-strong px-4 py-2.5">
-              <span className="text-sm font-bold">Groupe {group.name}</span>
-              <span className="text-xs text-muted">
-                {group.teams?.length || 0} équipes
-              </span>
-            </div>
+        {sorted.map((group) => {
+          const teamRows = [...(group.teams || [])].sort(
+            (a, b) => b.points - a.points || b.goals_for - a.goals_for
+          );
+          return (
+            <div
+              key={group.id || group.name}
+              className="overflow-hidden rounded-lg border border-border bg-panel"
+            >
+              <div className="flex items-center justify-between border-b border-border bg-panel-strong px-4 py-2.5">
+                <span className="text-sm font-bold">Groupe {group.name}</span>
+                <span className="text-xs text-muted">
+                  {teamRows.length} équipes
+                </span>
+              </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-xs text-muted">
-                    <th className="px-4 py-2 text-left font-medium">#</th>
-                    <th className="px-4 py-2 text-left font-medium">Équipe</th>
-                    <th className="px-2 py-2 text-center font-medium">MJ</th>
-                    <th className="px-2 py-2 text-center font-medium">N</th>
-                    <th className="px-2 py-2 text-center font-medium">P</th>
-                    <th className="px-2 py-2 text-center font-medium">BP</th>
-                    <th className="px-2 py-2 text-center font-medium">BC</th>
-                    <th className="px-4 py-2 text-center font-medium">Pts</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(group.teams || [])
-                    .sort((a, b) => b.points - a.points || b.goals_for - a.goals_for)
-                    .map((team, i) => (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-xs text-muted">
+                      <th className="px-3 py-2 text-left font-medium">#</th>
+                      <th className="px-3 py-2 text-left font-medium">Équipe</th>
+                      <th className="px-2 py-2 text-center font-medium">MJ</th>
+                      <th className="px-2 py-2 text-center font-medium">N</th>
+                      <th className="px-2 py-2 text-center font-medium">P</th>
+                      <th className="px-2 py-2 text-center font-medium">BP</th>
+                      <th className="px-2 py-2 text-center font-medium">BC</th>
+                      <th className="px-3 py-2 text-center font-medium">Pts</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teamRows.map((team, i) => (
                       <tr
                         key={team.team_id || i}
                         className={`border-b border-border/50 transition hover:bg-panel-strong ${
                           i < 2 ? "bg-accent/5" : ""
                         }`}
                       >
-                        <td className="px-4 py-2.5 text-muted">{i + 1}</td>
-                        <td className="px-4 py-2.5 font-medium">
-                          {team.team_name_en}
+                        <td className="px-3 py-2.5 text-muted">{i + 1}</td>
+                        <td className="px-3 py-2.5 font-medium">
+                          <span className="mr-1.5">{getTeamFlag(team.team_id, teams)}</span>
+                          {getTeamName(team.team_id, teams)}
                         </td>
                         <td className="px-2 py-2.5 text-center tabular-nums">
                           {team.played}
@@ -96,16 +136,17 @@ export function GroupStandings({ groups }: { groups: FootballGroup[] }) {
                         <td className="px-2 py-2.5 text-center tabular-nums">
                           {team.goals_against}
                         </td>
-                        <td className="px-4 py-2.5 text-center font-bold tabular-nums">
+                        <td className="px-3 py-2.5 text-center font-bold tabular-nums">
                           {team.points}
                         </td>
                       </tr>
                     ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { FootballMatch, FootballGroup } from "@/types";
+import type { FootballMatch, FootballGroup, FootballTeam } from "@/types";
 import { MatchCard } from "./MatchCard";
 import { GroupStandings } from "./GroupStandings";
 import { MatchSchedule } from "./MatchSchedule";
@@ -13,21 +13,46 @@ export function FootballPage() {
   const [tab, setTab] = useState<Tab>("today");
   const [matches, setMatches] = useState<FootballMatch[]>([]);
   const [groups, setGroups] = useState<FootballGroup[]>([]);
+  const [teams, setTeams] = useState<Record<string, FootballTeam>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [gamesRes, groupsRes] = await Promise.all([
+        const [gamesRes, groupsRes, teamsRes] = await Promise.all([
           fetch("https://worldcup26.ir/get/games"),
           fetch("https://worldcup26.ir/get/groups"),
+          fetch("https://worldcup26.ir/get/teams"),
         ]);
-        if (!gamesRes.ok || !groupsRes.ok) throw new Error("Failed to fetch");
+        if (!gamesRes.ok || !groupsRes.ok || !teamsRes.ok) throw new Error("Failed to fetch");
         const gamesData = await gamesRes.json();
         const groupsData = await groupsRes.json();
+        const teamsData = await teamsRes.json();
         setMatches(gamesData.games || gamesData);
-        setGroups(groupsData.groups || groupsData);
+        const teamsMap: Record<string, FootballTeam> = {};
+        for (const t of teamsData.teams || teamsData) {
+          teamsMap[t.id] = t;
+        }
+        setTeams(teamsMap);
+
+        const rawGroups = groupsData.groups || groupsData;
+        const transformedGroups: FootballGroup[] = rawGroups.map((g: Record<string, unknown>) => ({
+          id: String(g._id || g.id || ""),
+          name: String(g.name || ""),
+          teams: ((g.teams || []) as Record<string, unknown>[]).map((t) => ({
+            team_id: String(t.team_id || t.id || ""),
+            team_name_en: teamsMap[String(t.team_id || t.id)]?.name_en || `Team #${t.team_id}`,
+            played: Number(t.mp ?? t.played ?? 0),
+            win: Number(t.w ?? t.win ?? 0),
+            draw: Number(t.d ?? t.draw ?? 0),
+            loss: Number(t.l ?? t.loss ?? 0),
+            goals_for: Number(t.gf ?? t.goals_for ?? 0),
+            goals_against: Number(t.ga ?? t.goals_against ?? 0),
+            points: Number(t.pts ?? t.points ?? 0),
+          })),
+        }));
+        setGroups(transformedGroups);
       } catch {
         setError("Impossible de charger les données de la Coupe du Monde.");
       } finally {
@@ -164,7 +189,7 @@ export function FootballPage() {
         </div>
       )}
 
-      {tab === "standings" && <GroupStandings groups={groups} />}
+      {tab === "standings" && <GroupStandings groups={groups} teams={teams} />}
 
       {tab === "schedule" && <MatchSchedule matches={matches} />}
     </div>

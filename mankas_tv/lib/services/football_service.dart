@@ -32,4 +32,22 @@ class FootballService {
     } catch (_) {}
     return [];
   }
+
+  static Future<Map<String, String>> getTeamNames() async {
+    try {
+      final response = await http.get(Uri.parse('$_baseUrl/get/teams'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final teams = data['teams'] as List<dynamic>? ?? data as List<dynamic>;
+        final map = <String, String>{};
+        for (final t in teams) {
+          final id = (t['id'] ?? '').toString();
+          final name = (t['name_en'] ?? '').toString();
+          if (id.isNotEmpty && name.isNotEmpty) map[id] = name;
+        }
+        return map;
+      }
+    } catch (_) {}
+    return {};
+  }
 }

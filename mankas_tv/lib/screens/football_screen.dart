@@ -15,6 +15,7 @@ class FootballScreen extends StatefulWidget {
 class _FootballScreenState extends State<FootballScreen> {
   List<FootballMatch> _matches = [];
   List<FootballGroup> _groups = [];
+  Map<String, String> _teamNames = {};
   bool _loading = true;
   int _selectedTab = 0;
 
@@ -25,12 +26,16 @@ class _FootballScreenState extends State<FootballScreen> {
   }
 
   Future<void> _loadData() async {
-    final matches = await FootballService.getMatches();
-    final groups = await FootballService.getGroups();
+    final results = await Future.wait([
+      FootballService.getMatches(),
+      FootballService.getGroups(),
+      FootballService.getTeamNames(),
+    ]);
     if (mounted) {
       setState(() {
-        _matches = matches;
-        _groups = groups;
+        _matches = results[0] as List<FootballMatch>;
+        _groups = results[1] as List<FootballGroup>;
+        _teamNames = results[2] as Map<String, String>;
         _loading = false;
       });
     }
@@ -106,7 +111,7 @@ class _FootballScreenState extends State<FootballScreen> {
       case 0:
         return _buildTodayTab();
       case 1:
-        return GroupStandings(groups: _groups);
+        return GroupStandings(groups: _groups, teamNames: _teamNames);
       case 2:
         return MatchSchedule(matches: _matches);
       default:
