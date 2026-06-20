@@ -6,8 +6,8 @@ import '../models/channel.dart';
 
 class ChannelService {
   static const _favoritesKey = 'favorites';
-  static const _cacheKey = 'channels_cache_v4';
-  static const _apiBase = 'https://mankas-c9tluz8iw-mariekat00s-projects.vercel.app';
+  static const _cacheKey = 'channels_cache_v5';
+  static const _apiBase = 'https://mankas-tv.vercel.app';
 
   static const guaranteedChannels = [
     // ── Sports ──
@@ -111,7 +111,7 @@ class ChannelService {
 
   static Future<List<Channel>> _fetchFromApi() async {
     try {
-      final response = await http.get(Uri.parse('$_apiBase/api/channels'));
+      final response = await http.get(Uri.parse('$_apiBase/data/channels.json'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final list = data['channels'] as List<dynamic>;
