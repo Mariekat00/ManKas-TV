@@ -64,13 +64,6 @@ export type FootballTeam = {
   name_en: string;
   name_fa: string;
   flag: string;
-};
-
-export type FootballTeam = {
-  id: string;
-  name_en: string;
-  name_fa: string;
-  flag: string;
   fifa_code: string;
   iso2: string;
   group: string;

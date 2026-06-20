@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { readFileSync } from "fs";
-import { join } from "path";
+import iptvChannelsData from "@/data/iptv_channels.json";
 import type { Channel } from "@/types";
+
+const iptvChannels: Channel[] = iptvChannelsData as Channel[];
 
 // Guaranteed channels (verified working, always first)
 const guaranteedChannels: Channel[] = [
@@ -37,23 +38,9 @@ const guaranteedChannels: Channel[] = [
 ];
 
 export async function GET() {
-  try {
-    const jsonPath = join(process.cwd(), "data", "iptv_channels.json");
-    const content = readFileSync(jsonPath, "utf-8");
-    const iptvChannels: Channel[] = JSON.parse(content);
+  const allChannels = [...guaranteedChannels, ...iptvChannels];
 
-    const allChannels = [...guaranteedChannels, ...iptvChannels];
-
-    return NextResponse.json({ channels: allChannels }, {
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (e: any) {
-    return NextResponse.json({
-      channels: guaranteedChannels,
-      error: e?.message || String(e),
-      stack: e?.stack,
-    }, {
-      headers: { "Cache-Control": "no-store" },
-    });
-  }
+  return NextResponse.json({ channels: allChannels }, {
+    headers: { "Cache-Control": "no-store" },
+  });
 }

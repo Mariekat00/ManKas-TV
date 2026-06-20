@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FootballGroup, FootballTeam } from "@/types";
+import { getTeamFlag } from "@/lib/flags";
 
 type Props = {
   groups: FootballGroup[];
@@ -10,32 +11,6 @@ type Props = {
 
 function getTeamName(teamId: string, teams: Record<string, FootballTeam>): string {
   return teams[teamId]?.name_en || `Team #${teamId}`;
-}
-
-function getTeamFlag(teamId: string, teams: Record<string, FootballTeam>): string {
-  const name = teams[teamId]?.name_en || "";
-  const flags: Record<string, string> = {
-    "Mexico": "🇲🇽", "South Korea": "🇰🇷", "Czech Republic": "🇨🇿",
-    "South Africa": "🇿🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭",
-    "Canada": "🇨🇦", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨",
-    "Germany": "🇩🇪", "Paraguay": "🇵🇾", "Australia": "🇦🇺",
-    "Turkey": "🇹🇷", "United States": "🇺🇸", "Japan": "🇯🇵",
-    "Sweden": "🇸🇪", "Tunisia": "🇹🇳", "Netherlands": "🇳🇱",
-    "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴", "France": "🇫🇷",
-    "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿", "Belgium": "🇧🇪",
-    "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾", "Spain": "🇪🇸",
-    "Panama": "🇵🇦", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Croatia": "🇭🇷", "Ghana": "🇬🇭",
-    "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴", "Argentina": "🇦🇷",
-    "Colombia": "🇨🇴", "Portugal": "🇵🇹", "Morocco": "🇲🇦",
-    "Cameroon": "🇨🇲", "Serbia": "🇷🇸", "Poland": "🇵🇱",
-    "Brazil": "🇧🇷", "Italy": "🇮🇹", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-    "Denmark": "🇩🇰", "Greece": "🇬🇷", "Romania": "🇷🇴",
-    "Hungary": "🇭🇺", "Slovakia": "🇸🇰", "Ukraine": "🇺🇦",
-    "Bosnia and Herzegovina": "🇧🇦", "Haiti": "🇭🇹", "Curaçao": "🇨🇼",
-    "Cape Verde": "🇨🇻", "Austria": "🇦🇹", "Democratic Republic of the Congo": "🇨🇩",
-    "Uzbekistan": "🇺🇿", "Algeria": "🇩🇿",
-  };
-  return flags[name] || "🏳️";
 }
 
 export function GroupStandings({ groups, teams }: Props) {
@@ -118,7 +93,7 @@ export function GroupStandings({ groups, teams }: Props) {
                       >
                         <td className="px-3 py-2.5 text-muted">{i + 1}</td>
                         <td className="px-3 py-2.5 font-medium">
-                          <span className="mr-1.5">{getTeamFlag(team.team_id, teams)}</span>
+                          <span className="mr-1.5">{getTeamFlag(getTeamName(team.team_id, teams))}</span>
                           {getTeamName(team.team_id, teams)}
                         </td>
                         <td className="px-2 py-2.5 text-center tabular-nums">
