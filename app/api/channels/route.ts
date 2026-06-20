@@ -1,330 +1,208 @@
 import { NextResponse } from "next/server";
+import { readFileSync } from "fs";
+import { join } from "path";
 import type { Channel } from "@/types";
 
-export async function GET() {
-  const channels: Channel[] = [
-    // ── Spain ──
-    {
-      id: "rmtv",
-      name: "Real Madrid TV",
-      logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Real_Madrid_CF.svg/512px-Real_Madrid_CF.svg.png",
-      stream_url: "https://rmtv.akamaized.net/hls/live/2043153/rmtv-es-web/master.m3u8",
-      category: "Sports",
-      country: "Spain",
-      language: "Spanish",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "gol-classics",
-      name: "Gol Classics",
-      logo: "https://img.icons8.com/fluency/512/soccer.png",
-      stream_url: "https://d71gqtnep83vb.cloudfront.net/gol_classics/gol_classics.m3u8",
-      category: "Sports",
-      country: "Spain",
-      language: "Spanish",
-      created_at: new Date().toISOString(),
-    },
-    // ── France ──
-    {
-      id: "lequipe",
-      name: "L'Equipe",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/L%27%C3%89quipe_wordmark.svg/640px-L%27%C3%89quipe_wordmark.svg.png",
-      stream_url: "https://www.dailymotion.com/video/x2lefik",
-      category: "Sports",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "equidia",
-      name: "Equidia",
-      logo: "https://img.icons8.com/fluency/512/horse.png",
-      stream_url: "https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8",
-      category: "Sports",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "trace-sport-stars",
-      name: "Trace Sport Stars",
-      logo: "https://cdn-icons-png.flaticon.com/512/3112/3112948.png",
-      stream_url: "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8",
-      category: "Sports",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "ftf-sports",
-      name: "FTF Sports",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Logo_France_T%C3%A9l%C3%A9visions.svg/512px-Logo_France_T%C3%A9l%C3%A9visions.svg.png",
-      stream_url: "https://1657061170.rsc.cdn77.org/HLS/FTF-LINEAR.m3u8",
-      category: "Sports",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "nrj12",
-      name: "NRJ 12",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/NRJ12_logo_2015.svg/749px-NRJ12_logo_2015.svg.png",
-      stream_url: "https://nrj12.nrjaudio.fm/hls/live/2038374/nrj_12/master.m3u8",
-      category: "Entertainment",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "cgtvfrench",
-      name: "CGTN Francais",
-      logo: "https://i.imgur.com/fMsJYzl.png",
-      stream_url: "https://news.cgtn.com/resource/live/french/cgtn-f.m3u8",
-      category: "News",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    // ── USA (Spanish) ──
-    {
-      id: "telemundo-ny",
-      name: "Telemundo NY",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/6/68/Telemundo_logo_2018.svg",
-      stream_url: "https://nbculocallive.akamaized.net/hls/live/2037083/newyork/stream7/master.m3u8",
-      category: "Sports",
-      country: "USA",
-      language: "Spanish",
-      created_at: new Date().toISOString(),
-    },
-    // ── Qatar ──
-    {
-      id: "alkass-one",
-      name: "Alkass One",
-      logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png",
-      stream_url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "Qatar",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "alkass-two",
-      name: "Alkass Two",
-      logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png",
-      stream_url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "Qatar",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    // ── Morocco ──
-    {
-      id: "arryadia",
-      name: "Arryadia",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Arryadia_logo.svg/512px-Arryadia_logo.svg.png",
-      stream_url: "https://stream-lb.livemediama.com/arryadia/hls/master.m3u8",
-      category: "Sports",
-      country: "Morocco",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "arryadia-hd1",
-      name: "Arryadia HD1",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Arryadia_logo.svg/512px-Arryadia_logo.svg.png",
-      stream_url: "https://stream-lb.livemediama.com/arryadia-hd-01/hls/master.m3u8",
-      category: "Sports",
-      country: "Morocco",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    // ── beIN Sports ──
-    {
-      id: "bein-xtra",
-      name: "beIN Sports XTRA",
-      logo: "https://static.wikia.nocookie.net/logopedia/images/0/0b/BeIN_Xtra.PNG",
-      stream_url: "https://bein-xtra-bein.amagi.tv/playlist.m3u8",
-      category: "Sports",
-      country: "Qatar",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "bein-xtra-es",
-      name: "beIN Sports XTRA Español",
-      logo: "https://static.wikia.nocookie.net/logopedia/images/0/0b/BeIN_Xtra.PNG",
-      stream_url: "https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8",
-      category: "Sports",
-      country: "USA",
-      language: "Spanish",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "bein-sports-1",
-      name: "beIN Sports 1",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/BeIN_Sports_logo_%28vertical_version%29.svg/500px-BeIN_Sports_logo_%28vertical_version%29.svg.png",
-      stream_url: "http://23.237.104.106:8080/USA_BEIN/index.m3u8",
-      category: "Sports",
-      country: "USA",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    // ── More Free Sports ──
-    {
-      id: "30a-golf",
-      name: "30A Golf Kingdom",
-      logo: "https://img.icons8.com/fluency/512/golf.png",
-      stream_url: "https://30a-tv.com/feeds/vidaa/golf.m3u8",
-      category: "Sports",
-      country: "USA",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "as3-sport",
-      name: "AS3 Sport TV",
-      logo: "https://img.icons8.com/fluency/512/sports.png",
-      stream_url: "https://streamtv.as3sport.online:3394/hybrid/play.m3u8",
-      category: "Sports",
-      country: "International",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "bahrain-sports-1",
-      name: "Bahrain Sports 1",
-      logo: "https://img.icons8.com/fluency/512/basketball.png",
-      stream_url: "https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8",
-      category: "Sports",
-      country: "Bahrain",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "cricket-gold",
-      name: "Cricket Gold",
-      logo: "https://img.icons8.com/fluency/512/cricket.png",
-      stream_url: "https://streams2.sofast.tv/scheduler/scheduleMaster/418.m3u8",
-      category: "Sports",
-      country: "India",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "draftkings",
-      name: "DraftKings Network",
-      logo: "https://img.icons8.com/fluency/512/slot-machine.png",
-      stream_url: "https://na.linear.zype.com/e0bd0e23-a958-4e43-8164-4f2fef8876a8/fd3614bd-90bf-4530-a277-65ae3a1720c8-zype/live.m3u8",
-      category: "Sports",
-      country: "USA",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    // ── Brazil (YouTube) ──
-    {
-      id: "cazetv",
-      name: "CazéTV",
-      logo: "https://img.icons8.com/fluency/512/youtube-play.png",
-      stream_url: "https://www.youtube.com/@cazetvoficial/live",
-      category: "Sports",
-      country: "Brazil",
-      language: "Portuguese",
-      created_at: new Date().toISOString(),
-    },
-    // ── FIFA World Cup 2026 ──
-    {
-      id: "bbc-one",
-      name: "BBC One",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/960px-BBC_One_logo_2021.svg.png",
-      stream_url: "http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/hls_tablet/ak/bbc_one_london.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "UK",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "bbc-two",
-      name: "BBC Two",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/960px-BBC_Two_logo_2021.svg.png",
-      stream_url: "http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/hls_tablet/ak/bbc_two_england.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "UK",
-      language: "English",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "canal-sport",
-      name: "Canal+ Sport",
-      logo: "https://i.imgur.com/EOXnU15.png",
-      stream_url: "http://151.80.18.177:86/Canal+_sport_HD/index.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "canal-foot",
-      name: "Canal+ Foot",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Canal%2BFoot.png",
-      stream_url: "https://test.946985.filegear-sg.me/proxy/ef3174f16d4557d2",
-      category: "FIFA World Cup 2026",
-      country: "France",
-      language: "French",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "ard-erde",
-      name: "ARD (Das Erste)",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/ARD_Dachmarke_2014.svg/960px-ARD_Dachmarke_2014.svg.png",
-      stream_url: "https://daserste-live.ard-mcdn.de/daserste/live/hls/int/master.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "Germany",
-      language: "German",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "telemundo-intl",
-      name: "Telemundo Internacional",
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Telemundo_logo_2018.svg/960px-Telemundo_logo_2018.svg.png",
-      stream_url: "http://138.121.15.230:9002/TELEMUNDO/index.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "USA",
-      language: "Spanish",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "cctv-football",
-      name: "CCTV Storm Football",
-      logo: "https://i.imgur.com/Fy6HkX0.png",
-      stream_url: "http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub",
-      category: "FIFA World Cup 2026",
-      country: "China",
-      language: "Chinese",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "alkass-three",
-      name: "Alkass Three",
-      logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png",
-      stream_url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "Qatar",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: "alkass-four",
-      name: "Alkass Four",
-      logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png",
-      stream_url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8",
-      category: "FIFA World Cup 2026",
-      country: "Qatar",
-      language: "Arabic",
-      created_at: new Date().toISOString(),
-    },
-  ];
+const attrPattern = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
 
-  return NextResponse.json({ channels }, {
-    headers: { "Cache-Control": "no-store" },
-  });
+function parseM3U(input: string): Channel[] {
+  const lines = input.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const channels: Channel[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.startsWith("#EXTINF")) continue;
+    const nextLine = lines[i + 1];
+    if (!nextLine || nextLine.startsWith("#")) continue;
+
+    const attrs = new Map<string, string>();
+    for (const match of line.matchAll(attrPattern)) {
+      attrs.set(match[1].toLowerCase(), match[2]);
+    }
+
+    const commaIdx = line.indexOf(",");
+    const rawName = commaIdx !== -1
+      ? line.substring(commaIdx + 1).trim()
+      : attrs.get("tvg-name") ?? "Untitled";
+
+    const url = nextLine;
+    if (!url.startsWith("http")) continue;
+
+    const country = attrs.get("tvg-country") ?? "";
+    const m3uCategory = attrs.get("group-title") ?? "General";
+
+    channels.push({
+      id: `iptv-${Buffer.from(url).toString("base64").slice(0, 12)}`,
+      name: rawName.replace(/[\u0000-\u001F]/g, ""),
+      logo: attrs.get("tvg-logo") || null,
+      stream_url: url,
+      category: mapCategory(m3uCategory, rawName),
+      country: mapCountry(country),
+      language: attrs.get("tvg-language") || null,
+      created_at: new Date().toISOString(),
+    });
+  }
+
+  return channels;
+}
+
+const africanCountries = [
+  "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
+  "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros",
+  "Congo", "Democratic Republic of the Congo", "Djibouti", "Egypt",
+  "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon",
+  "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Ivory Coast", "Kenya",
+  "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali",
+  "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger",
+  "Nigeria", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles",
+  "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan",
+  "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe",
+];
+
+function mapCountry(code: string): string {
+  const map: Record<string, string> = {
+    AL: "Albania", AD: "Andorra", AR: "Argentina", AM: "Armenia",
+    AU: "Australia", AT: "Austria", AZ: "Azerbaijan", BY: "Belarus",
+    BE: "Belgium", BA: "Bosnia and Herzegovina", BR: "Brazil",
+    BG: "Bulgaria", CA: "Canada", TD: "Chad", CL: "Chile",
+    CN: "China", CR: "Costa Rica", HR: "Croatia", CY: "Cyprus",
+    CZ: "Czech Republic", DK: "Denmark", DO: "Dominican Republic",
+    EG: "Egypt", EE: "Estonia", FO: "Faroe Islands", FI: "Finland",
+    FR: "France", GE: "Georgia", DE: "Germany", GR: "Greece",
+    GL: "Greenland", HK: "Hong Kong", HU: "Hungary", IS: "Iceland",
+    IN: "India", ID: "Indonesia", IR: "Iran", IQ: "Iraq",
+    IE: "Ireland", IL: "Israel", IT: "Italy", JP: "Japan",
+    KR: "South Korea", XK: "Kosovo", LV: "Latvia", LT: "Lithuania",
+    LU: "Luxembourg", MO: "Macau", MT: "Malta", MX: "Mexico",
+    MD: "Moldova", MC: "Monaco", ME: "Montenegro", NL: "Netherlands",
+    NO: "Norway", PY: "Paraguay", PE: "Peru", PL: "Poland",
+    PT: "Portugal", QA: "Qatar", RO: "Romania", RU: "Russia",
+    SM: "San Marino", SA: "Saudi Arabia", RS: "Serbia", SK: "Slovakia",
+    SI: "Slovenia", SO: "Somalia", ES: "Spain", SE: "Sweden",
+    CH: "Switzerland", TW: "Taiwan", TT: "Trinidad", TR: "Turkey",
+    GB: "UK", UA: "Ukraine", AE: "United Arab Emirates", US: "USA",
+    VE: "Venezuela", DZ: "Algeria", AO: "Angola", BJ: "Benin",
+    BW: "Botswana", BF: "Burkina Faso", BI: "Burundi", CM: "Cameroon",
+    CV: "Cape Verde", CF: "Central African Republic", CG: "Congo",
+    CD: "Democratic Republic of the Congo", DJ: "Djibouti",
+    GQ: "Equatorial Guinea", ER: "Eritrea", SZ: "Eswatini",
+    ET: "Ethiopia", GA: "Gabon", GM: "Gambia", GH: "Ghana",
+    GN: "Guinea", GW: "Guinea-Bissau", CI: "Ivory Coast", KE: "Kenya",
+    LS: "Lesotho", LR: "Liberia", LY: "Libya", MG: "Madagascar",
+    MW: "Malawi", ML: "Mali", MR: "Mauritania", MU: "Mauritius",
+    MA: "Morocco", MZ: "Mozambique", NA: "Namibia", NE: "Niger",
+    NG: "Nigeria", RW: "Rwanda", ST: "Sao Tome and Principe",
+    SN: "Senegal", SC: "Seychelles", SL: "Sierra Leone",
+    ZA: "South Africa", SS: "South Sudan", SD: "Sudan",
+    TZ: "Tanzania", TG: "Togo", TN: "Tunisia", UG: "Uganda",
+    ZM: "Zambia", ZW: "Zimbabwe", KP: "North Korea", MK: "North Macedonia",
+    NZ: "New Zealand",
+  };
+  return map[code] || code;
+}
+
+function mapCategory(m3uGroup: string, name: string): string {
+  const n = name.toLowerCase();
+  const g = m3uGroup.toLowerCase();
+
+  if (g.includes("sport") || n.includes("sport") || n.includes("football") ||
+      n.includes("soccer") || n.includes("basket") || n.includes("tennis") ||
+      n.includes("f1") || n.includes("nba") || n.includes("nfl") ||
+      n.includes("espn") || n.includes("bein") || n.includes("sky sport") ||
+      n.includes("canal+ sport") || n.includes("equidia")) {
+    return "Sports";
+  }
+
+  if (g === "news" || g === "news (ar)" || g === "news (es)" ||
+      n.includes("news") || n.includes("info") || n.includes("24") ||
+      n.includes("cnn") || n.includes("bbc news") || n.includes("france info") ||
+      n.includes("bfmtv") || n.includes("cnews") || n.includes("euro news") ||
+      n.includes("euronews") || n.includes("al jazeera") || n.includes("trt") ||
+      n.includes("i24") || n.includes("lci") || n.includes("sud radio")) {
+    return "Actualités";
+  }
+
+  if (n.includes("music") || n.includes("mtv") || n.includes("mcm") ||
+      n.includes("nrj") || n.includes("trace") || n.includes("wfm") ||
+      n.includes("radio") || n.includes("fun radio") || n.includes("skyrock") ||
+      n.includes("rfm") || n.includes("rire et chansons") || g.includes("music")) {
+    return "Musique";
+  }
+
+  if (g.includes("entertainment") || g.includes("general") ||
+      n.includes("tmc") || n.includes("w9") || n.includes("tfx") ||
+      n.includes("nrj12") || n.includes("c8") || n.includes("cstar") ||
+      n.includes("gulli") || n.includes("m6") || n.includes("tf1") ||
+      n.includes("france 2") || n.includes("france 3") || n.includes("arte") ||
+      n.includes("rtl") || n.includes("tvi") || n.includes("mediaset") ||
+      n.includes("rai") || n.includes("tve") || n.includes("antena")) {
+    return "Divertissement";
+  }
+
+  return m3uGroup || "General";
+}
+
+// Guaranteed channels (verified working)
+const guaranteedChannels: Channel[] = [
+  // ── Sports ──
+  { id: "rmtv", name: "Real Madrid TV", logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Real_Madrid_CF.svg/512px-Real_Madrid_CF.svg.png", stream_url: "https://rmtv.akamaized.net/hls/live/2043153/rmtv-es-web/master.m3u8", category: "Sports", country: "Spain", language: "Spanish", created_at: "" },
+  { id: "gol-classics", name: "Gol Classics", logo: "https://img.icons8.com/fluency/512/soccer.png", stream_url: "https://d71gqtnep83vb.cloudfront.net/gol_classics/gol_classics.m3u8", category: "Sports", country: "Spain", language: "Spanish", created_at: "" },
+  { id: "lequipe", name: "L'Equipe", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/L%27%C3%89quipe_wordmark.svg/640px-L%27%C3%89quipe_wordmark.svg.png", stream_url: "https://www.dailymotion.com/video/x2lefik", category: "Sports", country: "France", language: "French", created_at: "" },
+  { id: "equidia", name: "Equidia", logo: "https://img.icons8.com/fluency/512/horse.png", stream_url: "https://raw.githubusercontent.com/Paradise-91/ParaTV/main/streams/equidia/live2.m3u8", category: "Sports", country: "France", language: "French", created_at: "" },
+  { id: "trace-sport-stars", name: "Trace Sport Stars", logo: "https://cdn-icons-png.flaticon.com/512/3112/3112948.png", stream_url: "https://lightning-tracesport-samsungau.amagi.tv/playlist.m3u8", category: "Sports", country: "France", language: "French", created_at: "" },
+  { id: "ftf-sports", name: "FTF Sports", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Logo_France_T%C3%A9l%C3%A9visions.svg/512px-Logo_France_T%C3%A9l%C3%A9visions.svg.png", stream_url: "https://1657061170.rsc.cdn77.org/HLS/FTF-LINEAR.m3u8", category: "Sports", country: "France", language: "French", created_at: "" },
+  { id: "telemundo-ny", name: "Telemundo NY", logo: "https://upload.wikimedia.org/wikipedia/commons/6/68/Telemundo_logo_2018.svg", stream_url: "https://nbculocallive.akamaized.net/hls/live/2037083/newyork/stream7/master.m3u8", category: "Sports", country: "USA", language: "Spanish", created_at: "" },
+  { id: "arryadia", name: "Arryadia", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Arryadia_logo.svg/512px-Arryadia_logo.svg.png", stream_url: "https://stream-lb.livemediama.com/arryadia/hls/master.m3u8", category: "Sports", country: "Morocco", language: "Arabic", created_at: "" },
+  { id: "arryadia-hd1", name: "Arryadia HD1", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Arryadia_logo.svg/512px-Arryadia_logo.svg.png", stream_url: "https://stream-lb.livemediama.com/arryadia-hd-01/hls/master.m3u8", category: "Sports", country: "Morocco", language: "Arabic", created_at: "" },
+  { id: "bein-xtra", name: "beIN Sports XTRA", logo: "https://static.wikia.nocookie.net/logopedia/images/0/0b/BeIN_Xtra.PNG", stream_url: "https://bein-xtra-bein.amagi.tv/playlist.m3u8", category: "Sports", country: "Qatar", language: "Arabic", created_at: "" },
+  { id: "bein-xtra-es", name: "beIN Sports XTRA Español", logo: "https://static.wikia.nocookie.net/logopedia/images/0/0b/BeIN_Xtra.PNG", stream_url: "https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8", category: "Sports", country: "USA", language: "Spanish", created_at: "" },
+  { id: "bein-sports-1", name: "beIN Sports 1", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/BeIN_Sports_logo_%28vertical_version%29.svg/500px-BeIN_Sports_logo_%28vertical_version%29.svg.png", stream_url: "http://23.237.104.106:8080/USA_BEIN/index.m3u8", category: "Sports", country: "USA", language: "English", created_at: "" },
+  { id: "30a-golf", name: "30A Golf Kingdom", logo: "https://img.icons8.com/fluency/512/golf.png", stream_url: "https://30a-tv.com/feeds/vidaa/golf.m3u8", category: "Sports", country: "USA", language: "English", created_at: "" },
+  { id: "as3-sport", name: "AS3 Sport TV", logo: "https://img.icons8.com/fluency/512/sports.png", stream_url: "https://streamtv.as3sport.online:3394/hybrid/play.m3u8", category: "Sports", country: "International", language: "English", created_at: "" },
+  { id: "bahrain-sports-1", name: "Bahrain Sports 1", logo: "https://img.icons8.com/fluency/512/basketball.png", stream_url: "https://5c7b683162943.streamlock.net/live/ngrp:sportsone_all/playlist.m3u8", category: "Sports", country: "Bahrain", language: "Arabic", created_at: "" },
+  { id: "cricket-gold", name: "Cricket Gold", logo: "https://img.icons8.com/fluency/512/cricket.png", stream_url: "https://streams2.sofast.tv/scheduler/scheduleMaster/418.m3u8", category: "Sports", country: "India", language: "English", created_at: "" },
+  { id: "draftkings", name: "DraftKings Network", logo: "https://img.icons8.com/fluency/512/slot-machine.png", stream_url: "https://na.linear.zype.com/e0bd0e23-a958-4e43-8164-4f2fef8876a8/fd3614bd-90bf-4530-a277-65ae3a1720c8-zype/live.m3u8", category: "Sports", country: "USA", language: "English", created_at: "" },
+  { id: "cazetv", name: "CazéTV", logo: "https://img.icons8.com/fluency/512/youtube-play.png", stream_url: "https://www.youtube.com/@cazetvoficial/live", category: "Sports", country: "Brazil", language: "Portuguese", created_at: "" },
+  // ── FIFA World Cup 2026 ──
+  { id: "alkass-one", name: "Alkass One", logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png", stream_url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8", category: "FIFA World Cup 2026", country: "Qatar", language: "Arabic", created_at: "" },
+  { id: "alkass-two", name: "Alkass Two", logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png", stream_url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8", category: "FIFA World Cup 2026", country: "Qatar", language: "Arabic", created_at: "" },
+  { id: "alkass-three", name: "Alkass Three", logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png", stream_url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8", category: "FIFA World Cup 2026", country: "Qatar", language: "Arabic", created_at: "" },
+  { id: "alkass-four", name: "Alkass Four", logo: "https://logovector.net/wp-content/uploads/2013/12/al-kass-sport-channel-logo-vector-2-163055.png", stream_url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8", category: "FIFA World Cup 2026", country: "Qatar", language: "Arabic", created_at: "" },
+  { id: "bbc-one", name: "BBC One", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/960px-BBC_One_logo_2021.svg.png", stream_url: "http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/hls_tablet/ak/bbc_one_london.m3u8", category: "FIFA World Cup 2026", country: "UK", language: "English", created_at: "" },
+  { id: "bbc-two", name: "BBC Two", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/960px-BBC_Two_logo_2021.svg.png", stream_url: "http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/hls_tablet/ak/bbc_two_england.m3u8", category: "FIFA World Cup 2026", country: "UK", language: "English", created_at: "" },
+  { id: "canal-sport", name: "Canal+ Sport", logo: "https://i.imgur.com/EOXnU15.png", stream_url: "http://151.80.18.177:86/Canal+_sport_HD/index.m3u8", category: "FIFA World Cup 2026", country: "France", language: "French", created_at: "" },
+  { id: "canal-foot", name: "Canal+ Foot", logo: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Canal%2BFoot.png", stream_url: "https://test.946985.filegear-sg.me/proxy/ef3174f16d4557d2", category: "FIFA World Cup 2026", country: "France", language: "French", created_at: "" },
+  { id: "ard-erde", name: "ARD (Das Erste)", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/ARD_Dachmarke_2014.svg/960px-ARD_Dachmarke_2014.svg.png", stream_url: "https://daserste-live.ard-mcdn.de/daserste/live/hls/int/master.m3u8", category: "FIFA World Cup 2026", country: "Germany", language: "German", created_at: "" },
+  { id: "telemundo-intl", name: "Telemundo Internacional", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Telemundo_logo_2018.svg/960px-Telemundo_logo_2018.svg.png", stream_url: "http://138.121.15.230:9002/TELEMUNDO/index.m3u8", category: "FIFA World Cup 2026", country: "USA", language: "Spanish", created_at: "" },
+  { id: "cctv-football", name: "CCTV Storm Football", logo: "https://i.imgur.com/Fy6HkX0.png", stream_url: "http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub", category: "FIFA World Cup 2026", country: "China", language: "Chinese", created_at: "" },
+];
+
+export async function GET() {
+  try {
+    const m3uPath = join(process.cwd(), "IPTV", "playlist.m3u8");
+    const content = readFileSync(m3uPath, "utf-8");
+    const m3uChannels = parseM3U(content);
+
+    // Deduplicate M3U channels by stream_url
+    const seen = new Set<string>();
+    const unique: Channel[] = [];
+    for (const ch of m3uChannels) {
+      if (!seen.has(ch.stream_url)) {
+        seen.add(ch.stream_url);
+        unique.push(ch);
+      }
+    }
+
+    // Combine: guaranteed first, then M3U channels filtered
+    const allChannels = [...guaranteedChannels, ...unique];
+
+    return NextResponse.json({ channels: allChannels }, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch {
+    // Fallback to guaranteed only if M3U fails
+    return NextResponse.json({ channels: guaranteedChannels }, {
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
 }
