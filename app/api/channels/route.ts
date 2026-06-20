@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import channelsData from "@/data/iptv_channels.json";
 import type { Channel } from "@/types";
 
 const guaranteedChannels: Channel[] = [
@@ -34,12 +33,8 @@ const guaranteedChannels: Channel[] = [
   { id: "cctv-football", name: "CCTV Storm Football", logo: "", stream_url: "http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub", category: "Sports", country: "China", language: "Chinese", created_at: "" },
 ];
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
-  const iptvChannels = channelsData as Channel[];
-  const allChannels = [...guaranteedChannels, ...iptvChannels];
-  return NextResponse.json({ channels: allChannels }, {
+  return NextResponse.json({ channels: guaranteedChannels }, {
     headers: { "Cache-Control": "no-store" },
   });
 }
