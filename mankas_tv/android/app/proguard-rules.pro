@@ -1,0 +1,4 @@
+-keep class com.arthenica.** { *; }
+-keep class androidx.media3.** { *; }
+-keep class io.flutter.** { *; }
+-dontwarn io.flutter.embedding.**
