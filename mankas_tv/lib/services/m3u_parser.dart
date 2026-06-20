@@ -20,13 +20,13 @@ class M3uParser {
       final commaIndex = line.indexOf(',');
       final rawName = commaIndex != -1
           ? line.substring(commaIndex + 1).trim()
-          : attrs['tvg-name'] ?? 'Untitled';
+          : attrs['tvg-name'] ?? 'Sans nom';
 
       channels.add(M3uChannel(
         name: rawName,
         logo: attrs['tvg-logo'],
         streamUrl: nextLine,
-        category: attrs['group-title'] ?? 'General',
+        category: attrs['group-title'] ?? 'Général',
         country: attrs['tvg-country'],
         language: attrs['tvg-language'],
       ));

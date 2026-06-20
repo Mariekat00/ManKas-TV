@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -30,6 +31,8 @@ class ManKasTvApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ManKas TV',
+      locale: const Locale('fr', 'FR'),
+      supportedLocales: const [Locale('fr', 'FR'), Locale('en', 'US')],
       theme: AppTheme.dark,
       debugShowCheckedModeBanner: false,
       home: const HomeScreen(),

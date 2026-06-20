@@ -10,8 +10,8 @@ class TvProvider extends ChangeNotifier {
   List<String> _favorites = [];
   Channel? _selectedChannel;
   String _query = '';
-  String _category = 'All';
-  String _country = 'All';
+  String _category = 'Tout';
+  String _country = 'Tout';
   bool _showFavoritesOnly = false;
   bool _isLoading = true;
 
@@ -25,8 +25,8 @@ class TvProvider extends ChangeNotifier {
   bool get showFavoritesOnly => _showFavoritesOnly;
   bool get isLoading => _isLoading;
 
-  Set<String> get categories => _channels.map((c) => c.category ?? 'General').toSet();
-  Set<String> get countries => _channels.map((c) => c.country ?? 'Unknown').toSet();
+  Set<String> get categories => _channels.map((c) => c.category ?? 'Général').toSet();
+  Set<String> get countries => _channels.map((c) => c.country ?? 'Inconnu').toSet();
 
   Future<void> loadChannels() async {
     _isLoading = true;
@@ -88,8 +88,8 @@ class TvProvider extends ChangeNotifier {
           ch.name.toLowerCase().contains(q) ||
           (ch.country?.toLowerCase().contains(q) ?? false) ||
           (ch.language?.toLowerCase().contains(q) ?? false);
-      final matchesCategory = _category == 'All' || ch.category == _category;
-      final matchesCountry = _country == 'All' || ch.country == _country;
+      final matchesCategory = _category == 'Tout' || ch.category == _category;
+      final matchesCountry = _country == 'Tout' || ch.country == _country;
       final matchesFavorites = !_showFavoritesOnly || _favorites.contains(ch.id);
       return matchesSearch && matchesCategory && matchesCountry && matchesFavorites;
     }).toList();

@@ -20,8 +20,8 @@ class ChannelCard extends StatelessWidget {
     final cat = channel.category ?? '';
     if (cat.contains('World Cup') || cat.contains('FIFA')) return const Color(0xFFD4AF37);
     if (cat == 'Sports') return const Color(0xFF22C55E);
-    if (cat == 'Entertainment') return const Color(0xFFA855F7);
-    if (cat == 'News') return const Color(0xFF3B82F6);
+    if (cat == 'Divertissement') return const Color(0xFFA855F7);
+    if (cat == 'Actualités') return const Color(0xFF3B82F6);
     return const Color(0xFF6366F1);
   }
 
@@ -29,8 +29,8 @@ class ChannelCard extends StatelessWidget {
     final cat = channel.category ?? '';
     if (cat.contains('World Cup') || cat.contains('FIFA')) return Icons.sports_soccer;
     if (cat == 'Sports') return Icons.sports;
-    if (cat == 'Entertainment') return Icons.tv;
-    if (cat == 'News') return Icons.public;
+    if (cat == 'Divertissement') return Icons.tv;
+    if (cat == 'Actualités') return Icons.public;
     return Icons.live_tv;
   }
 
@@ -90,7 +90,7 @@ class ChannelCard extends StatelessWidget {
                         color: isFavorite ? Colors.redAccent : null,
                       ),
                       label: Text(
-                        isFavorite ? 'Saved' : 'Favorite',
+                        isFavorite ? 'Sauvegardée' : 'Favori',
                         style: const TextStyle(fontSize: 10),
                       ),
                       style: OutlinedButton.styleFrom(

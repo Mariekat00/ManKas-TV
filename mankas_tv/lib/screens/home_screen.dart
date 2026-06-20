@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'PUBLIC IPTV',
+                        'IPTV PUBLIC',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(builder: (_) => const FootballScreen()),
                       );
                     },
-                    tooltip: 'FIFA World Cup 2026',
+                    tooltip: 'Coupe du Monde FIFA 2026',
                   ),
                   IconButton(
                     icon: const Icon(Icons.admin_panel_settings, size: 22),
@@ -98,11 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    _metric('Channels', provider.channels.length),
+                    _metric('Chaînes', provider.channels.length),
                     const SizedBox(width: 8),
-                    _metric('Countries', provider.countries.length),
+                    _metric('Pays', provider.countries.length),
                     const SizedBox(width: 8),
-                    _metric('Categories', provider.categories.length),
+                    _metric('Catégories', provider.categories.length),
                   ],
                 ),
               );

@@ -36,7 +36,7 @@ class _AdminScreenState extends State<AdminScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign-in failed: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Connexion échouée : $e'), backgroundColor: Colors.red),
         );
         setState(() => _isLoading = false);
       }
@@ -69,14 +69,14 @@ class _AdminScreenState extends State<AdminScreen> {
                 const Icon(Icons.admin_panel_settings, color: Colors.redAccent, size: 64),
                 const SizedBox(height: 24),
                 const Text(
-                  'Admin Access',
+                  'Accès Admin',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   _user == null
-                      ? 'Sign in with your authorized Google account.'
-                      : 'Account not authorized.\nOnly $adminEmail can access admin.',
+                      ? 'Connectez-vous avec votre compte Google autorisé.'
+                      : 'Compte non autorisé.\nSeul $adminEmail peut accéder à l\'admin.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
                 ),
@@ -88,7 +88,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _signInWithGoogle,
                       icon: const Icon(Icons.g_mobiledata, size: 24),
-                      label: const Text('Sign in with Google'),
+                      label: const Text('Se connecter avec Google'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E1E2E),
                         foregroundColor: Colors.white,
@@ -103,7 +103,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _signOut,
                       icon: const Icon(Icons.logout, size: 18),
-                      label: const Text('Sign out'),
+                      label: const Text('Déconnexion'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E1E2E),
                         foregroundColor: Colors.white,
@@ -126,7 +126,7 @@ class _AdminScreenState extends State<AdminScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E1E2E),
-        title: const Text('Admin Panel'),
+        title: const Text('Panneau Admin'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -142,7 +142,7 @@ class _AdminScreenState extends State<AdminScreen> {
                 IconButton(
                   icon: const Icon(Icons.logout, size: 18),
                   onPressed: _signOut,
-                  tooltip: 'Sign out',
+                  tooltip: 'Déconnexion',
                 ),
               ],
             ),
@@ -156,12 +156,12 @@ class _AdminScreenState extends State<AdminScreen> {
             Icon(Icons.verified_user, color: Colors.green.withValues(alpha: 0.8), size: 64),
             const SizedBox(height: 16),
             const Text(
-              'Admin Mode Active',
+              'Mode Admin actif',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Signed in as ${_user?.email}',
+              'Connecté en tant que ${_user?.email}',
               style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
             ),
           ],

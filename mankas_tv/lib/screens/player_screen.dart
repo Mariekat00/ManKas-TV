@@ -34,14 +34,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
       if (url.contains('youtube.com') || url.contains('youtu.be')) {
         setState(() {
-          _error = 'YouTube streams open in browser. URL: $url';
+          _error = 'Les flux YouTube s\'ouvrent dans le navigateur. URL : $url';
         });
         return;
       }
 
       if (url.contains('twitch.tv')) {
         setState(() {
-          _error = 'Twitch streams open in browser. URL: $url';
+          _error = 'Les flux Twitch s\'ouvrent dans le navigateur. URL : $url';
         });
         return;
       }
@@ -49,7 +49,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       await _player.open(Media(url));
       setState(() => _isInitialized = true);
     } catch (e) {
-      setState(() => _error = 'Failed to load stream: $e');
+      setState(() => _error = 'Échec du chargement du flux : $e');
     }
   }
 
@@ -140,7 +140,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   });
                   _initPlayer();
                 },
-                child: const Text('Retry'),
+                child: const Text('Réessayer'),
               ),
             ],
           ),
@@ -155,7 +155,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           children: [
             CircularProgressIndicator(color: Colors.white54),
             SizedBox(height: 16),
-            Text('Loading stream...', style: TextStyle(color: Colors.white54)),
+            Text('Chargement du flux...', style: TextStyle(color: Colors.white54)),
           ],
         ),
       );

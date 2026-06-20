@@ -15,11 +15,11 @@ class AuthService {
     final googleSignIn = GoogleSignIn(serverClientId: webClientId);
     final googleUser = await googleSignIn.signIn();
 
-    if (googleUser == null) throw Exception('Google sign-in was cancelled.');
+    if (googleUser == null) throw Exception('Connexion Google annulée.');
 
     final googleAuth = await googleUser.authentication;
     final idToken = googleAuth.idToken;
-    if (idToken == null) throw Exception('No ID token from Google.');
+    if (idToken == null) throw Exception('Pas de jeton ID de Google.');
 
     await _supabase.auth.signInWithIdToken(
       provider: OAuthProvider.google,

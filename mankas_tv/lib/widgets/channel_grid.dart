@@ -17,7 +17,7 @@ class ChannelGrid extends StatelessWidget {
 
         if (provider.filteredChannels.isEmpty) {
           return const Center(
-            child: Text('No channels match the current filters.', style: TextStyle(color: Colors.white54)),
+            child: Text('Aucune chaîne ne correspond aux filtres.', style: TextStyle(color: Colors.white54)),
           );
         }
 

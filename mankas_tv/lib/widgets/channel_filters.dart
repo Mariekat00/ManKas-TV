@@ -9,8 +9,8 @@ class ChannelFilters extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TvProvider>(
       builder: (context, provider, _) {
-        final categories = ['All', ...provider.categories.toList()..sort()];
-        final countries = ['All', ...provider.countries.toList()..sort()];
+        final categories = ['Tout', ...provider.categories.toList()..sort()];
+        final countries = ['Tout', ...provider.countries.toList()..sort()];
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -82,7 +82,7 @@ class ChannelFilters extends StatelessWidget {
                           dropdownColor: const Color(0xFF2A2A3E),
                           style: const TextStyle(fontSize: 12, color: Colors.white),
                           items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis))).toList(),
-                          onChanged: (v) => provider.setCategory(v ?? 'All'),
+                          onChanged: (v) => provider.setCategory(v ?? 'Tout'),
                         ),
                       ),
                     ),
@@ -104,7 +104,7 @@ class ChannelFilters extends StatelessWidget {
                           dropdownColor: const Color(0xFF2A2A3E),
                           style: const TextStyle(fontSize: 12, color: Colors.white),
                           items: countries.map((c) => DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis))).toList(),
-                          onChanged: (v) => provider.setCountry(v ?? 'All'),
+                          onChanged: (v) => provider.setCountry(v ?? 'Tout'),
                         ),
                       ),
                     ),
