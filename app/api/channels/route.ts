@@ -47,8 +47,12 @@ export async function GET() {
     return NextResponse.json({ channels: allChannels }, {
       headers: { "Cache-Control": "no-store" },
     });
-  } catch (e) {
-    return NextResponse.json({ channels: guaranteedChannels, error: String(e) }, {
+  } catch (e: any) {
+    return NextResponse.json({
+      channels: guaranteedChannels,
+      error: e?.message || String(e),
+      stack: e?.stack,
+    }, {
       headers: { "Cache-Control": "no-store" },
     });
   }
