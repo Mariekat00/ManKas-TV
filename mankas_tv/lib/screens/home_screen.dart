@@ -4,6 +4,7 @@ import '../providers/tv_provider.dart';
 import '../widgets/channel_filters.dart';
 import '../widgets/channel_grid.dart';
 import 'admin_screen.dart';
+import 'football_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,6 +67,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.sports_soccer, size: 22),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const FootballScreen()),
+                      );
+                    },
+                    tooltip: 'FIFA World Cup 2026',
+                  ),
                   IconButton(
                     icon: const Icon(Icons.admin_panel_settings, size: 22),
                     onPressed: () {

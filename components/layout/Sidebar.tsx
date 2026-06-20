@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Clock3, Heart, Home, PlusCircle, Tv, X } from "lucide-react";
+import { Clock3, Heart, Home, PlusCircle, Tv, Trophy, X } from "lucide-react";
 import { useTvStore } from "@/store/useTvStore";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/football", label: "FIFA World Cup 2026", icon: Trophy },
   { href: "/#channels", label: "Channels", icon: Tv },
   { href: "/#favorites", label: "Favorites", icon: Heart },
   { href: "/#recent", label: "Recent", icon: Clock3 },

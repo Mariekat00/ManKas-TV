@@ -35,3 +35,58 @@ export type M3UChannel = ChannelInsert & {
 };
 
 export type PlayerStatus = "idle" | "loading" | "playing" | "error";
+
+// ── FIFA World Cup 2026 ──
+
+export type FootballMatch = {
+  id: string;
+  home_team_id: string;
+  away_team_id: string;
+  home_team_name_en: string;
+  away_team_name_en: string;
+  home_score: string;
+  away_score: string;
+  home_scorers: string;
+  away_scorers: string;
+  group: string;
+  matchday: string;
+  local_date: string;
+  finished: string;
+  time_elapsed: string;
+  type: string;
+  stadium_id?: string;
+  home_team_label?: string;
+  away_team_label?: string;
+};
+
+export type FootballTeam = {
+  id: string;
+  name_en: string;
+  name_fa: string;
+  flag: string;
+};
+
+export type FootballGroup = {
+  id: string;
+  name: string;
+  teams: FootballGroupTeam[];
+};
+
+export type FootballGroupTeam = {
+  team_id: string;
+  team_name_en: string;
+  played: number;
+  win: number;
+  draw: number;
+  loss: number;
+  goals_for: number;
+  goals_against: number;
+  points: number;
+};
+
+export type FootballStadium = {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+};
