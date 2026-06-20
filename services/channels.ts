@@ -25,7 +25,7 @@ export async function getChannels() {
   }
 
   try {
-    const response = await fetch("/api/channels");
+    const response = await fetch("/data/channels.json");
     if (response.ok) {
       const data = await response.json();
       if (data.channels && data.channels.length > 0) {
