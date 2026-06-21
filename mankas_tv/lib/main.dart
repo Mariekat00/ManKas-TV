@@ -3,22 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
+import 'config.dart';
 import 'providers/tv_provider.dart';
+import 'services/notification_service.dart';
+import 'services/connectivity_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
-
-const supabaseUrl = 'https://mpodxxqzjsbojmkirsdz.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wb2R4eHF6anNib2pta2lyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Mzc1MTgsImV4cCI6MjA5NzIxMzUxOH0.JUViDdrIW4BwPuZ7g--CjbTBa8XdY7iDhliZ6TahSPk';
-const adminEmail = 'moisemanda2000@gmail.com';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  await Supabase.initialize(url: Config.supabaseUrl, anonKey: Config.supabaseAnonKey);
+
+  await NotificationService().init();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => TvProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TvProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectivityService()..startMonitoring()),
+      ],
       child: const ManKasTvApp(),
     ),
   );

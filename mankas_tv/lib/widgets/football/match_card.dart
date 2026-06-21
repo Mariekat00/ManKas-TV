@@ -38,10 +38,10 @@ class MatchCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: live ? Colors.red.withValues(alpha: 0.4) : const Color(0xFF2A2A3E),
+          color: live ? Colors.red.withAlpha(102) : const Color(0xFF2A2A3E),
         ),
       ),
-      color: live ? Colors.red.withValues(alpha: 0.05) : const Color(0xFF1E1E2E),
+      color: live ? Colors.red.withAlpha(13) : const Color(0xFF1E1E2E),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -53,17 +53,17 @@ class MatchCard extends StatelessWidget {
                   match.roundLabel,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white.withValues(alpha: 0.4),
+                          color: Colors.white.withAlpha(102),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: live
-                        ? Colors.red.withValues(alpha: 0.15)
+                        ? Colors.red.withAlpha(38)
                         : match.isFinished
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : const Color(0xFF6366F1).withValues(alpha: 0.15),
+                            ? Colors.white.withAlpha(13)
+                            : const Color(0xFF6366F1).withAlpha(38),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -129,7 +129,7 @@ class MatchCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.white.withValues(alpha: 0.4),
+                    color: Colors.white.withAlpha(102),
                         ),
                       ),
                 Expanded(
@@ -175,7 +175,7 @@ class MatchCard extends StatelessWidget {
               scorers,
               style: TextStyle(
                 fontSize: 11,
-                color: Colors.white.withValues(alpha: 0.5),
+                color: Colors.white.withAlpha(128),
               ),
             ),
           ),

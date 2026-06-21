@@ -32,15 +32,16 @@ export default function RootLayout({
     >
       <head>
         <script
+          id="theme-script"
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var theme = localStorage.getItem('mankas-theme');
-                if (theme === 'light' || theme === 'dark') {
-                  document.documentElement.className = document.documentElement.className.replace(/\bdark\b|\blight\b/g, '').trim() + ' ' + theme;
-                }
-              })();
-            `,
+            __html: [
+              'try{',
+              'var t=localStorage.getItem("mankas-theme");',
+              'if(t==="light"||t==="dark"){',
+              'document.documentElement.className=document.documentElement.className.replace(/\\bdark\\b|\\blight\\b/g,"").trim()+" "+t;',
+              '}',
+              '}catch(e){}',
+            ].join(''),
           }}
         />
       </head>

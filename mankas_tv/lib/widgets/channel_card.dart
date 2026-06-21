@@ -22,6 +22,7 @@ class ChannelCard extends StatelessWidget {
     if (cat == 'Sports') return const Color(0xFF22C55E);
     if (cat == 'Divertissement') return const Color(0xFFA855F7);
     if (cat == 'Actualités') return const Color(0xFF3B82F6);
+    if (cat == 'Musique') return const Color(0xFFEC4899);
     return const Color(0xFF6366F1);
   }
 
@@ -31,75 +32,95 @@ class ChannelCard extends StatelessWidget {
     if (cat == 'Sports') return Icons.sports;
     if (cat == 'Divertissement') return Icons.tv;
     if (cat == 'Actualités') return Icons.public;
+    if (cat == 'Musique') return Icons.music_note;
     return Icons.live_tv;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
+    final color = _categoryColor();
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A2E),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withAlpha(77), width: 1),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
+              flex: 3,
               child: Container(
-                color: const Color(0xFF1E1E2E),
+                color: const Color(0xFF12121F),
                 child: channel.logo != null && channel.logo!.isNotEmpty
                     ? CachedNetworkImage(
                         imageUrl: channel.logo!,
                         fit: BoxFit.contain,
-                        placeholder: (_, __) => Center(
-                          child: Icon(_categoryIcon(), size: 40, color: _categoryColor().withValues(alpha: 0.3)),
-                        ),
-                        errorWidget: (_, __, ___) => _buildFallback(),
+                        placeholder: (_, __) => _buildFallback(color),
+                        errorWidget: (_, __, ___) => _buildFallback(color),
                       )
-                    : _buildFallback(),
+                    : _buildFallback(color),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    channel.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    [channel.category, channel.country, channel.language]
-                        .where((e) => e != null && e.isNotEmpty)
-                        .join(' / '),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 10, color: Colors.white.withValues(alpha: 0.4)),
-                  ),
-                  const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 30,
-                    child: OutlinedButton.icon(
-                      onPressed: onFavoriteToggle,
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        size: 12,
-                        color: isFavorite ? Colors.redAccent : null,
-                      ),
-                      label: Text(
-                        isFavorite ? 'Sauvegardée' : 'Favori',
-                        style: const TextStyle(fontSize: 10),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 0),
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      channel.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withAlpha(51),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        [channel.category, channel.country]
+                            .where((e) => e != null && e.isNotEmpty)
+                            .join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 9, color: color),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          size: 14,
+                          color: isFavorite ? Colors.redAccent : Colors.white38,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            channel.language ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 10, color: Colors.white38),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -108,14 +129,13 @@ class ChannelCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFallback() {
-    final color = _categoryColor();
+  Widget _buildFallback(Color color) {
     return Center(
       child: Container(
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
+          color: color.withAlpha(51),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Icon(_categoryIcon(), size: 28, color: color),

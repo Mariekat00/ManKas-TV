@@ -3,6 +3,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
 import '../providers/tv_provider.dart';
+import '../services/notification_service.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key});
@@ -11,7 +12,7 @@ class PlayerScreen extends StatefulWidget {
   State<PlayerScreen> createState() => _PlayerScreenState();
 }
 
-class _PlayerScreenState extends State<PlayerScreen> {
+class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver {
   late final Player _player;
   late final VideoController _controller;
   bool _isInitialized = false;
@@ -20,17 +21,45 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _player = Player();
     _controller = VideoController(_player);
+    _player.stream.error.listen((e) {
+      if (mounted) setState(() => _error = 'Erreur de lecture : $e');
+    });
     _initPlayer();
   }
 
-  Future<void> _initPlayer() async {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _showNotification();
+    } else if (state == AppLifecycleState.resumed) {
+      NotificationService().cancelAll();
+    }
+  }
+
+  Future<void> _showNotification() async {
+    final channel = context.read<TvProvider>().selectedChannel;
+    if (channel == null) return;
+    await NotificationService().showMediaNotification(
+      id: channel.id.hashCode,
+      title: channel.name,
+      artist: channel.category,
+    );
+  }
+
+  Future<void> _initPlayer({String? newUrl}) async {
     final channel = context.read<TvProvider>().selectedChannel;
     if (channel == null) return;
 
+    setState(() {
+      _error = null;
+      _isInitialized = false;
+    });
+
     try {
-      String url = channel.streamUrl;
+      String url = newUrl ?? channel.streamUrl;
 
       if (url.contains('youtube.com') || url.contains('youtu.be')) {
         setState(() {
@@ -55,6 +84,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    NotificationService().cancelAll();
     _player.dispose();
     super.dispose();
   }
@@ -97,7 +128,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               .where((e) => e != null && e.isNotEmpty)
                               .join(' / '),
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: Colors.white.withAlpha(128),
                             fontSize: 12,
                           ),
                         ),
@@ -133,13 +164,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _error = null;
-                    _isInitialized = false;
-                  });
-                  _initPlayer();
-                },
+                onPressed: () => _initPlayer(),
                 child: const Text('Réessayer'),
               ),
             ],

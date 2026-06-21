@@ -153,7 +153,7 @@ class _FootballScreenState extends State<FootballScreen> {
                 'Aucun match en cours aujourd\'hui',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.4),
+                  color: Colors.white.withAlpha(102),
                   fontSize: 14,
                 ),
               ),
@@ -181,7 +181,7 @@ class _FootballScreenState extends State<FootballScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+              color: const Color(0xFF6366F1).withAlpha(38),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(

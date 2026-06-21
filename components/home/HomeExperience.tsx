@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
+import { Radio, Tv } from "lucide-react";
 import { ChannelFilters } from "@/components/channels/ChannelFilters";
 import { ChannelGrid } from "@/components/channels/ChannelGrid";
 import { RecentlyWatched } from "@/components/channels/RecentlyWatched";
@@ -22,6 +24,7 @@ export function HomeExperience() {
 
   return (
     <div className="mx-auto flex max-w-[1800px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+      {/* Hero with video player */}
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <VideoPlayer channel={selectedChannel} />
         <div className="flex flex-col justify-end gap-4">
@@ -37,6 +40,26 @@ export function HomeExperience() {
               history across devices.
             </p>
           </div>
+
+          {/* Two main navigation buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/live"
+              className="flex flex-col items-center gap-2 rounded-xl bg-red-500 p-5 text-white transition hover:bg-red-600"
+            >
+              <Radio size={28} />
+              <span className="text-sm font-bold">Matchs Live</span>
+            </Link>
+            <a
+              href="#channels"
+              className="flex flex-col items-center gap-2 rounded-xl bg-accent p-5 text-white transition hover:opacity-90"
+            >
+              <Tv size={28} />
+              <span className="text-sm font-bold">Chaînes IPTV</span>
+            </a>
+          </div>
+
+          {/* Metrics */}
           <div className="grid grid-cols-3 gap-3">
             <Metric label="Channels" value={channels.length} />
             <Metric label="Countries" value={new Set(channels.map((item) => item.country).filter(Boolean)).size} />

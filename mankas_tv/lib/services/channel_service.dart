@@ -6,7 +6,6 @@ import '../models/channel.dart';
 
 class ChannelService {
   static const _favoritesKey = 'favorites';
-  static const _cacheKey = 'channels_cache_v5';
   static const _apiBase = 'https://mankas-tv.vercel.app';
 
   static const guaranteedChannels = [
@@ -43,75 +42,11 @@ class ChannelService {
     Channel(id: 'cctv-football', name: 'CCTV Storm Football', logo: 'https://i.imgur.com/Fy6HkX0.png', streamUrl: 'http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub', category: 'FIFA World Cup 2026', country: 'China', language: 'Chinese'),
   ];
 
-  static final _countryCodeMap = {
-    'AL': 'Albania', 'AD': 'Andorra', 'AR': 'Argentina', 'AM': 'Armenia',
-    'AU': 'Australia', 'AT': 'Austria', 'AZ': 'Azerbaijan', 'BY': 'Belarus',
-    'BE': 'Belgium', 'BA': 'Bosnia and Herzegovina', 'BR': 'Brazil',
-    'BG': 'Bulgaria', 'CA': 'Canada', 'CL': 'Chile', 'CN': 'China',
-    'CR': 'Costa Rica', 'HR': 'Croatia', 'CY': 'Cyprus', 'CZ': 'Czech Republic',
-    'DK': 'Denmark', 'DO': 'Dominican Republic', 'EG': 'Egypt', 'EE': 'Estonia',
-    'FI': 'Finland', 'FR': 'France', 'GE': 'Georgia', 'DE': 'Germany',
-    'GR': 'Greece', 'HK': 'Hong Kong', 'HU': 'Hungary', 'IS': 'Iceland',
-    'IN': 'India', 'ID': 'Indonesia', 'IR': 'Iran', 'IQ': 'Iraq',
-    'IE': 'Ireland', 'IL': 'Israel', 'IT': 'Italy', 'JP': 'Japan',
-    'KR': 'South Korea', 'LV': 'Latvia', 'LT': 'Lithuania', 'LU': 'Luxembourg',
-    'MX': 'Mexico', 'MD': 'Moldova', 'MC': 'Monaco', 'ME': 'Montenegro',
-    'NL': 'Netherlands', 'NO': 'Norway', 'PY': 'Paraguay', 'PE': 'Peru',
-    'PL': 'Poland', 'PT': 'Portugal', 'QA': 'Qatar', 'RO': 'Romania',
-    'RU': 'Russia', 'SA': 'Saudi Arabia', 'RS': 'Serbia', 'SK': 'Slovakia',
-    'SI': 'Slovenia', 'ES': 'Spain', 'SE': 'Sweden', 'CH': 'Switzerland',
-    'TW': 'Taiwan', 'TR': 'Turkey', 'GB': 'UK', 'UA': 'Ukraine',
-    'AE': 'United Arab Emirates', 'US': 'USA', 'VE': 'Venezuela',
-    'DZ': 'Algeria', 'AO': 'Angola', 'BJ': 'Benin', 'BW': 'Botswana',
-    'BF': 'Burkina Faso', 'BI': 'Burundi', 'CM': 'Cameroon', 'CV': 'Cape Verde',
-    'CF': 'Central African Republic', 'TD': 'Chad', 'CG': 'Congo',
-    'CD': 'Democratic Republic of the Congo', 'DJ': 'Djibouti',
-    'GQ': 'Equatorial Guinea', 'ER': 'Eritrea', 'SZ': 'Eswatini',
-    'ET': 'Ethiopia', 'GA': 'Gabon', 'GM': 'Gambia', 'GH': 'Ghana',
-    'GN': 'Guinea', 'GW': 'Guinea-Bissau', 'CI': 'Ivory Coast', 'KE': 'Kenya',
-    'LS': 'Lesotho', 'LR': 'Liberia', 'LY': 'Libya', 'MG': 'Madagascar',
-    'MW': 'Malawi', 'ML': 'Mali', 'MR': 'Mauritania', 'MU': 'Mauritius',
-    'MA': 'Morocco', 'MZ': 'Mozambique', 'NA': 'Namibia', 'NE': 'Niger',
-    'NG': 'Nigeria', 'RW': 'Rwanda', 'SN': 'Senegal', 'SC': 'Seychelles',
-    'SL': 'Sierra Leone', 'SO': 'Somalia', 'ZA': 'South Africa',
-    'SS': 'South Sudan', 'SD': 'Sudan', 'TZ': 'Tanzania', 'TG': 'Togo',
-    'TN': 'Tunisia', 'UG': 'Uganda', 'ZM': 'Zambia', 'ZW': 'Zimbabwe',
-  };
-
-  static String _mapCountry(String code) => _countryCodeMap[code] ?? code;
-
-  static String _mapCategory(String m3uGroup, String name) {
-    final n = name.toLowerCase();
-    final g = m3uGroup.toLowerCase();
-
-    if (g.contains('sport') || n.contains('sport') || n.contains('football') ||
-        n.contains('soccer') || n.contains('espn') || n.contains('bein') ||
-        n.contains('sky sport') || n.contains('equidia')) {
-      return 'Sports';
-    }
-    if (g == 'news' || g == 'news (ar)' || g == 'news (es)' ||
-        n.contains('news') || n.contains('cnn') || n.contains('france info') ||
-        n.contains('bfmtv') || n.contains('cnews') || n.contains('euronews') ||
-        n.contains('al jazeera') || n.contains('i24') || n.contains('lci')) {
-      return 'Actualités';
-    }
-    if (n.contains('music') || n.contains('mtv') || n.contains('mcm') ||
-        n.contains('nrj') || n.contains('trace') || n.contains('radio') ||
-        g.contains('music')) {
-      return 'Musique';
-    }
-    if (g.contains('entertainment') || n.contains('tmc') || n.contains('w9') ||
-        n.contains('tfx') || n.contains('nrj12') || n.contains('c8') ||
-        n.contains('m6') || n.contains('tf1') || n.contains('france 2') ||
-        n.contains('arte')) {
-      return 'Divertissement';
-    }
-    return m3uGroup;
-  }
-
   static Future<List<Channel>> _fetchFromApi() async {
     try {
-      final response = await http.get(Uri.parse('$_apiBase/data/channels.json'));
+      final response = await http.get(Uri.parse('$_apiBase/data/channels.json')).timeout(
+        const Duration(seconds: 30),
+      );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final list = data['channels'] as List<dynamic>;
@@ -125,21 +60,20 @@ class ChannelService {
           language: c['language'],
         )).toList();
       }
-    } catch (_) {}
+      print('Channel API returned ${response.statusCode}');
+    } catch (e) {
+      print('Channel API fetch failed: $e');
+    }
     return [];
   }
 
   Future<List<Channel>> getChannels() async {
-    // Try API first
+    // Try API first (no local cache — too large for 4554 channels on SharedPreferences)
     final apiChannels = await _fetchFromApi();
+
     if (apiChannels.isNotEmpty) {
-      await _cacheChannels(apiChannels);
       return apiChannels;
     }
-
-    // Fallback to cache
-    final cached = await _loadCachedChannels();
-    if (cached.isNotEmpty) return cached;
 
     // Fallback to guaranteed only
     return List<Channel>.from(guaranteedChannels);
@@ -161,16 +95,4 @@ class ChannelService {
     await prefs.setStringList(_favoritesKey, favorites);
   }
 
-  Future<void> _cacheChannels(List<Channel> channels) async {
-    final prefs = await SharedPreferences.getInstance();
-    final json = channels.map((c) => jsonEncode(c.toJson())).toList();
-    await prefs.setStringList(_cacheKey, json);
-  }
-
-  Future<List<Channel>> _loadCachedChannels() async {
-    final prefs = await SharedPreferences.getInstance();
-    final json = prefs.getStringList(_cacheKey);
-    if (json == null || json.isEmpty) return [];
-    return json.map((s) => Channel.fromJson(jsonDecode(s) as Map<String, dynamic>)).toList();
-  }
 }

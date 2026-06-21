@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { Clock3, Heart, Home, PlusCircle, Tv, Trophy, X } from "lucide-react";
+import { Clock3, Heart, Home, Info, PlusCircle, Radio, Tv, Trophy, X } from "lucide-react";
 import { useTvStore } from "@/store/useTvStore";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/live", label: "Matchs en Direct", icon: Radio },
   { href: "/football", label: "FIFA World Cup 2026", icon: Trophy },
-  { href: "/#channels", label: "Channels", icon: Tv },
-  { href: "/#favorites", label: "Favorites", icon: Heart },
-  { href: "/#recent", label: "Recent", icon: Clock3 },
+  { href: "/#channels", label: "Chaînes IPTV", icon: Tv },
+  { href: "/#favorites", label: "Favoris", icon: Heart },
+  { href: "/#recent", label: "Récent", icon: Clock3 },
+  { href: "/about", label: "À propos", icon: Info },
   { href: "/admin", label: "Admin", icon: PlusCircle },
 ];
 

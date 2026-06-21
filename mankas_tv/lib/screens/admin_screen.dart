@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart' show adminEmail;
+import '../config.dart';
 import '../services/auth_service.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -76,9 +76,9 @@ class _AdminScreenState extends State<AdminScreen> {
                 Text(
                   _user == null
                       ? 'Connectez-vous avec votre compte Google autorisé.'
-                      : 'Compte non autorisé.\nSeul $adminEmail peut accéder à l\'admin.',
+                      : 'Compte non autorisé.\nSeul ${Config.adminEmail} peut accéder à l\'admin.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                  style: TextStyle(color: Colors.white.withAlpha(153)),
                 ),
                 const SizedBox(height: 32),
                 if (_user == null)
@@ -133,11 +133,11 @@ class _AdminScreenState extends State<AdminScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.check_circle, color: Colors.green.withValues(alpha: 0.8), size: 16),
+                Icon(Icons.check_circle, color: Colors.green.withAlpha(204), size: 16),
                 const SizedBox(width: 4),
                 Text(
                   _user?.email ?? '',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                  style: TextStyle(color: Colors.white.withAlpha(153), fontSize: 12),
                 ),
                 IconButton(
                   icon: const Icon(Icons.logout, size: 18),
@@ -153,7 +153,7 @@ class _AdminScreenState extends State<AdminScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.verified_user, color: Colors.green.withValues(alpha: 0.8), size: 64),
+            Icon(Icons.verified_user, color: Colors.green.withAlpha(204), size: 64),
             const SizedBox(height: 16),
             const Text(
               'Mode Admin actif',
@@ -162,7 +162,7 @@ class _AdminScreenState extends State<AdminScreen> {
             const SizedBox(height: 8),
             Text(
               'Connecté en tant que ${_user?.email}',
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+              style: TextStyle(color: Colors.white.withAlpha(128)),
             ),
           ],
         ),

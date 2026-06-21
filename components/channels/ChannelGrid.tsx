@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -7,6 +8,8 @@ import { Heart, Play, RadioTower } from "lucide-react";
 import { addFavorite, addWatchHistory, removeFavorite } from "@/services/channels";
 import { useTvStore } from "@/store/useTvStore";
 import type { Channel } from "@/types";
+
+const PAGE_SIZE = 60;
 
 export function ChannelGrid({
   channels,
@@ -17,6 +20,12 @@ export function ChannelGrid({
   isLoading: boolean;
   error: string | null;
 }) {
+  const [visibleCount, setVisibleCount] = React.useState(PAGE_SIZE);
+
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [channels]);
+
   if (isLoading) {
     return <ChannelSkeleton />;
   }
@@ -37,11 +46,27 @@ export function ChannelGrid({
     );
   }
 
+  const visible = channels.slice(0, visibleCount);
+  const hasMore = visibleCount < channels.length;
+
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
-      {channels.map((channel) => (
-        <ChannelCard key={channel.id} channel={channel} />
-      ))}
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">
+        {visible.map((channel) => (
+          <ChannelCard key={channel.id} channel={channel} />
+        ))}
+      </div>
+      {hasMore && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+            className="rounded-md border border-border bg-panel px-6 py-2.5 text-sm text-muted transition hover:border-accent hover:text-foreground"
+          >
+            Charger plus ({visibleCount} / {channels.length})
+          </button>
+        </div>
+      )}
     </div>
   );
 }

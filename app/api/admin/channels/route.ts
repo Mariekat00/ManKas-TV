@@ -10,6 +10,12 @@ export async function POST(request: Request) {
 
   try {
     const payload = (await request.json()) as ChannelInsert;
+    if (!payload.name || typeof payload.name !== "string" || payload.name.trim().length === 0) {
+      return NextResponse.json({ error: "Channel name is required." }, { status: 400 });
+    }
+    if (!payload.stream_url || typeof payload.stream_url !== "string" || !payload.stream_url.startsWith("http")) {
+      return NextResponse.json({ error: "Valid stream URL is required." }, { status: 400 });
+    }
     const supabase = getSupabaseAdminClient();
     const { data, error } = await supabase
       .from("channels")
@@ -38,8 +44,8 @@ export async function DELETE(request: Request) {
   try {
     const { id } = (await request.json()) as { id?: string };
 
-    if (!id) {
-      return NextResponse.json({ error: "Channel id is required." }, { status: 400 });
+    if (!id || typeof id !== "string" || id.length > 100) {
+      return NextResponse.json({ error: "Invalid channel id." }, { status: 400 });
     }
 
     const supabase = getSupabaseAdminClient();

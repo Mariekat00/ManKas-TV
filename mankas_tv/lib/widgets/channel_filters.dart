@@ -28,7 +28,7 @@ class ChannelFilters extends StatelessWidget {
                           onPressed: () => provider.setQuery(''),
                         )
                       : null,
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+                  hintStyle: TextStyle(color: Colors.white.withAlpha(102)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
                 style: const TextStyle(fontSize: 15),

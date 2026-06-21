@@ -64,7 +64,7 @@ class GroupStandings extends StatelessWidget {
                     final team = sortedTeams[i];
                     return DataRow(
                       color: WidgetStateProperty.resolveWith((states) {
-                        if (i < 2) return const Color(0xFF6366F1).withValues(alpha: 0.05);
+                        if (i < 2) return const Color(0xFF6366F1).withAlpha(13);
                         return null;
                       }),
                       cells: [

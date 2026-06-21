@@ -1,16 +1,16 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../main.dart' show adminEmail;
+import '../config.dart';
 
 class AuthService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   User? get currentUser => _supabase.auth.currentUser;
   bool get isLoggedIn => currentUser != null;
-  bool get isAdmin => currentUser?.email?.toLowerCase() == adminEmail.toLowerCase();
+  bool get isAdmin => currentUser?.email?.toLowerCase() == Config.adminEmail.toLowerCase();
 
   Future<void> signInWithGoogle() async {
-    const webClientId = '451865698298-626fm5kgu56hd23tn9uphqd51u40l4j7.apps.googleusercontent.com';
+    const webClientId = Config.googleWebClientId;
 
     final googleSignIn = GoogleSignIn(serverClientId: webClientId);
     final googleUser = await googleSignIn.signIn();
