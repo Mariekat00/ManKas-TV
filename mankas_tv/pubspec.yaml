@@ -24,6 +24,7 @@ dependencies:
   supabase_flutter: ^2.8.4
   google_sign_in: ^6.2.2
   flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
 
 dev_dependencies:
   flutter_test:
@@ -35,7 +36,7 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/icon/icon.png"
-  adaptive_icon_background: "#7B2FBE"
+  adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/icon/icon.png"
 
 flutter:
