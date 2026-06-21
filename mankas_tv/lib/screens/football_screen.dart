@@ -132,6 +132,8 @@ class _FootballScreenState extends State<FootballScreen> {
     final next8 = upcoming.take(8).toList();
 
     return RefreshIndicator(
+      color: const Color(0xFF6366F1),
+      backgroundColor: const Color(0xFF1A1A2E),
       onRefresh: _loadData,
       child: ListView(
         padding: const EdgeInsets.all(16),

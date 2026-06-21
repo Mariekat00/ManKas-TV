@@ -88,82 +88,74 @@ class _ChannelGridState extends State<ChannelGrid> {
             final channel = visibleChannels[index];
             final color = _catColor(channel.category);
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Material(
-                color: const Color(0xFF1A1A2E),
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
+            return GestureDetector(
+              onTap: () {
+                provider.setSelectedChannel(channel);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PlayerScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A2E),
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    provider.setSelectedChannel(channel);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PlayerScreen()),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: color, width: 1),
+                  border: Border.all(color: color, width: 1),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF252540),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(_catIcon(channel.category), color: color, size: 24),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF252540),
-                            borderRadius: BorderRadius.circular(10),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            channel.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
-                          child: Icon(_catIcon(channel.category), color: color, size: 24),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                channel.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                [channel.category, channel.country, channel.language]
-                                    .where((e) => e != null && e.isNotEmpty)
-                                    .join(' · '),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 4),
+                          Text(
+                            [channel.category, channel.country, channel.language]
+                                .where((e) => e != null && e.isNotEmpty)
+                                .join(' · '),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            provider.isFavorite(channel.id)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 20,
-                            color: provider.isFavorite(channel.id)
-                                ? Colors.redAccent
-                                : Colors.white38,
-                          ),
-                          onPressed: () => provider.toggleFavorite(channel.id),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                    Icon(
+                      provider.isFavorite(channel.id)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      size: 20,
+                      color: provider.isFavorite(channel.id)
+                          ? Colors.redAccent
+                          : Colors.white38,
+                    ),
+                  ],
                 ),
               ),
             );

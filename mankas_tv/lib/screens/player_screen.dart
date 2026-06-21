@@ -49,6 +49,8 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
     );
   }
 
+  bool _retryingForceSeekable = false;
+
   Future<void> _initPlayer({String? newUrl}) async {
     final channel = context.read<TvProvider>().selectedChannel;
     if (channel == null) return;
@@ -75,9 +77,25 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
         return;
       }
 
-      await _player.open(Media(url));
+      Map<String, String>? headers;
+      if (url.contains('streamfree.app')) {
+        headers = {
+          'Referer': 'https://streamfree.app/',
+          'Origin': 'https://streamfree.app',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+        };
+      }
+      await _player.open(Media(url, httpHeaders: headers ?? {}));
       setState(() => _isInitialized = true);
     } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('force-seekable') && !_retryingForceSeekable) {
+        _retryingForceSeekable = true;
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _initPlayer(newUrl: newUrl);
+        _retryingForceSeekable = false;
+        return;
+      }
       setState(() => _error = 'Échec du chargement du flux : $e');
     }
   }
