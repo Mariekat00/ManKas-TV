@@ -5,7 +5,7 @@ import '../providers/tv_provider.dart';
 import '../utils/category_theme.dart';
 import '../utils/app_strings.dart';
 import '../screens/player_screen.dart';
-import 'package:share_plus/share_plus.dart';
+
 
 const int _pageSize = 50;
 
@@ -203,14 +203,6 @@ class _ChannelGridState extends State<ChannelGrid> {
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.share, size: 18, color: Colors.white38),
-                    onPressed: () {
-                      Share.share(
-                        'Regarde "${channel.name}" sur ManKas TV !\n${channel.streamUrl}',
-                      );
-                    },
                   ),
                   const SizedBox(width: 4),
                   Icon(

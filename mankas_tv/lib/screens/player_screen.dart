@@ -8,7 +8,7 @@ import '../models/channel.dart';
 import '../providers/tv_provider.dart';
 import '../services/notification_service.dart';
 import '../utils/app_strings.dart';
-import 'package:share_plus/share_plus.dart';
+
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key});
@@ -199,15 +199,6 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
                           IconButton(
                             icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white),
                             onPressed: _enterPip,
-                          ),
-                        if (channel != null)
-                          IconButton(
-                            icon: const Icon(Icons.share, color: Colors.white),
-                            onPressed: () {
-                              Share.share(
-                                'Regarde "${channel.name}" sur ManKas TV !\n${channel.streamUrl}',
-                              );
-                            },
                           ),
                         IconButton(
                           icon: Icon(
