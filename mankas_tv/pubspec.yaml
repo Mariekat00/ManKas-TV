@@ -22,7 +22,7 @@ dependencies:
   shared_preferences: ^2.3.4
   provider: ^6.1.2
   supabase_flutter: ^2.8.4
-  google_sign_in: ^6.2.2
+  google_sign_in: ^7.2.0
   flutter_local_notifications: ^18.0.1
   timezone: ^0.9.4
   url_launcher: ^6.3.1
