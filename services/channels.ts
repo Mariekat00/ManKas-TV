@@ -19,28 +19,49 @@ let channelCache:
 
 let nextMockId = 100;
 
+function isServer(): boolean {
+  return typeof window === "undefined";
+}
+
 export async function getChannels() {
   if (channelCache && channelCache.expiresAt > Date.now()) {
     return channelCache.data;
   }
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    const response = await fetch("/data/channels.json", { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (response.ok) {
-      const data = await response.json();
-      if (data.channels && data.channels.length > 0) {
+    // Server-side: use direct import
+  if (isServer()) {
+    try {
+      const { getServerChannels } = await import("@/lib/get-channels-server");
+      const channels = getServerChannels();
+      if (channels.length > 0) {
         channelCache = {
           expiresAt: Date.now() + CHANNEL_CACHE_TTL,
-          data: data.channels,
+          data: channels,
         };
         return channelCache.data;
       }
+    } catch (e) {
+      console.warn("getChannels server import failed:", e);
     }
-  } catch (e) {
-    console.warn("getChannels fetch /data/channels.json failed:", e);
+  } else {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const response = await fetch("/data/channels.json", { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.channels && data.channels.length > 0) {
+          channelCache = {
+            expiresAt: Date.now() + CHANNEL_CACHE_TTL,
+            data: data.channels,
+          };
+          return channelCache.data;
+        }
+      }
+    } catch (e) {
+      console.warn("getChannels fetch /data/channels.json failed:", e);
+    }
   }
 
   if (!isSupabaseConfigured()) {
