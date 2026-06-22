@@ -4,12 +4,13 @@ import '../models/football_match.dart';
 import '../models/channel.dart';
 import '../providers/tv_provider.dart';
 import '../services/football_service.dart';
+import '../utils/category_theme.dart';
+import '../utils/app_strings.dart';
 import '../services/match_notification_service.dart';
-import '../widgets/channel_filters.dart';
-import '../widgets/channel_grid.dart';
 import 'about_screen.dart';
 import 'admin_screen.dart';
 import 'football_screen.dart';
+import 'iptv_screen.dart';
 import 'live_matches_screen.dart';
 import 'player_screen.dart';
 
@@ -23,6 +24,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<FootballMatch> _upcomingMatches = [];
   bool _matchesLoading = true;
+  List<_CountedCat>? _cachedCounted;
+  int _channelVersion = 0;
 
   @override
   void initState() {
@@ -37,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final matches = await FootballService.getMatches();
     if (!mounted) return;
 
-    final now = DateTime.now();
     final upcoming = matches
         .where((m) => !m.hasStarted && !m.isFinished)
         .toList()
@@ -66,15 +68,15 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 10),
             _buildQuickAccess(),
             const SizedBox(height: 24),
-            _buildSectionTitle('⚽ Matchs du Jour', null),
+            _buildSectionTitle('⚽ Today\'s Matches', null),
             const SizedBox(height: 12),
             _buildMatchesSection(),
             const SizedBox(height: 28),
-            _buildSectionTitle('🔥 Chaînes Populaires', null),
+            _buildSectionTitle('🔥 Popular Channels', null),
             const SizedBox(height: 12),
             _buildPopularChannels(),
             const SizedBox(height: 28),
-            _buildSectionTitle('📂 Catégories', null),
+            _buildSectionTitle('📂 ${AppStrings.of(context).categories}', null),
             const SizedBox(height: 12),
             _buildCategories(),
             const SizedBox(height: 28),
@@ -135,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               MaterialPageRoute(builder: (_) => const AboutScreen()),
             ),
-            tooltip: 'À propos',
+            tooltip: AppStrings.of(context).about,
           ),
           IconButton(
             icon: const Icon(Icons.admin_panel_settings, size: 22, color: Colors.white60),
@@ -159,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _GradientButton(
               icon: Icons.tv,
-              label: 'Chaînes IPTV',
+              label: AppStrings.of(context).liveTV,
               gradient: const [Color(0xFF6366F1), Color(0xFF4F46E5)],
               onTap: () => Navigator.push(
                 context,
@@ -171,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _GradientButton(
               icon: Icons.sports_soccer,
-              label: 'Matchs Live',
+              label: 'Live Matches',
               gradient: const [Color(0xFFEF4444), Color(0xFFDC2626)],
               onTap: () => Navigator.push(
                 context,
@@ -192,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _PillButton(
             icon: Icons.emoji_events,
-            label: 'Coupe du Monde',
+            label: 'World Cup',
             color: const Color(0xFFF59E0B),
             onTap: () => Navigator.push(
               context,
@@ -202,11 +204,43 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
           Consumer<TvProvider>(
             builder: (context, provider, _) {
-              return _PillButton(
-                icon: Icons.favorite,
-                label: 'Favoris (${provider.favorites.length})',
-                color: const Color(0xFFEC4899),
-                onTap: () => provider.toggleFavoritesOnly(),
+              final active = provider.showFavoritesOnly;
+              return GestureDetector(
+                onTap: () {
+                  provider.toggleFavoritesOnly();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const IptvScreen()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: active ? const Color(0xFFEC4899).withAlpha(30) : const Color(0xFF1E1E2E),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: active ? const Color(0xFFEC4899) : const Color(0xFF2A2A3E),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        active ? Icons.favorite : Icons.favorite_border,
+                        color: active ? const Color(0xFFEC4899) : Colors.white70,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${AppStrings.of(context).favorites} (${provider.favorites.length})',
+                        style: TextStyle(
+                          color: active ? const Color(0xFFEC4899) : Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -265,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Icon(Icons.sports_soccer, size: 36, color: Colors.white.withAlpha(40)),
               const SizedBox(height: 8),
               Text(
-                'Aucun match à venir',
+                'No upcoming matches',
                 style: TextStyle(color: Colors.white.withAlpha(100), fontSize: 13),
               ),
             ],
@@ -344,22 +378,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── CATÉGORIES ─────────
-  Widget _buildCategories() {
-    final provider = context.read<TvProvider>();
-    final channels = provider.channels;
+  static const _catTemplates = [
+    _CatData('Sport', '⚽', Color(0xFF22C55E), 'Sports'),
+    _CatData('Actualités', '📰', Color(0xFF3B82F6), 'Actualités'),
+    _CatData('Musique', '🎵', Color(0xFFEC4899), 'Musique'),
+    _CatData('Cinéma', '🎬', Color(0xFFA855F7), 'Cinéma'),
+    _CatData('Afrique', '🌍', Color(0xFFF59E0B), 'Afrique'),
+    _CatData('Religion', '🙏', Color(0xFF06B6D4), 'Religion'),
+    _CatData('Jeunesse', '👶', Color(0xFF10B981), 'Jeunesse'),
+    _CatData('Documentaires', '📚', Color(0xFF8B5CF6), 'Documentaire'),
+  ];
 
-    final categories = [
-      _CatData('Sport', '⚽', const Color(0xFF22C55E), 'Sports'),
-      _CatData('Actualités', '📰', const Color(0xFF3B82F6), 'Actualités'),
-      _CatData('Musique', '🎵', const Color(0xFFEC4899), 'Musique'),
-      _CatData('Cinéma', '🎬', const Color(0xFFA855F7), 'Cinéma'),
-      _CatData('Afrique', '🌍', const Color(0xFFF59E0B), 'Afrique'),
-      _CatData('Religion', '🙏', const Color(0xFF06B6D4), 'Religion'),
-      _CatData('Jeunesse', '👶', const Color(0xFF10B981), 'Jeunesse'),
-      _CatData('Documentaires', '📚', const Color(0xFF8B5CF6), 'Documentaire'),
-    ];
-
-    final counted = categories.map((cat) {
+  List<_CountedCat> _computeCounts(List<Channel> channels) {
+    return _catTemplates.map((cat) {
       final count = channels.where((ch) {
         final c = (ch.category ?? '').toLowerCase();
         return c.contains(cat.filter.toLowerCase()) ||
@@ -367,6 +398,19 @@ class _HomeScreenState extends State<HomeScreen> {
       }).length;
       return _CountedCat(cat: cat, count: count);
     }).toList();
+  }
+
+  Widget _buildCategories() {
+    final provider = context.read<TvProvider>();
+    final channels = provider.channels;
+    final version = channels.length * 31 + channels.fold<int>(0, (sum, ch) => sum + (ch.category?.hashCode ?? 0));
+
+    if (_cachedCounted == null || version != _channelVersion) {
+      _cachedCounted = _computeCounts(channels);
+      _channelVersion = version;
+    }
+
+    final counted = _cachedCounted!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -405,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             const Text(
-              'Bienvenue sur ManKas TV',
+              'Welcome to ManKas TV',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -414,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Regardez gratuitement les meilleures chaînes IPTV publiques du monde.',
+              'Watch the best free public IPTV channels from around the world.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -434,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  'Découvrir les chaînes',
+                  'Discover channels',
                   style: TextStyle(
                     color: Color(0xFF4F46E5),
                     fontWeight: FontWeight.w700,
@@ -653,7 +697,7 @@ class _PopularChannelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final catColor = _catColor(channel.category);
+    final catColor = categoryColor(channel.category);
 
     return GestureDetector(
       onTap: () {
@@ -690,13 +734,13 @@ class _PopularChannelCard extends StatelessWidget {
                         height: 44,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Icon(
-                          _catIcon(channel.category),
+                          categoryIcon(channel.category),
                           color: catColor,
                           size: 22,
                         ),
                       ),
                     )
-                  : Icon(_catIcon(channel.category), color: catColor, size: 22),
+                  : Icon(categoryIcon(channel.category), color: catColor, size: 22),
             ),
             const SizedBox(height: 8),
             Text(
@@ -716,23 +760,6 @@ class _PopularChannelCard extends StatelessWidget {
     );
   }
 
-  static Color _catColor(String? cat) {
-    if (cat == null) return const Color(0xFF6366F1);
-    if (cat.contains('Sports') || cat.contains('FIFA')) return const Color(0xFF22C55E);
-    if (cat.contains('Actualités') || cat.contains('News')) return const Color(0xFF3B82F6);
-    if (cat.contains('Musique') || cat.contains('Music')) return const Color(0xFFEC4899);
-    if (cat.contains('Divertissement')) return const Color(0xFFA855F7);
-    return const Color(0xFF6366F1);
-  }
-
-  static IconData _catIcon(String? cat) {
-    if (cat == null) return Icons.live_tv;
-    if (cat.contains('Sports') || cat.contains('FIFA')) return Icons.sports_soccer;
-    if (cat.contains('Actualités') || cat.contains('News')) return Icons.public;
-    if (cat.contains('Musique') || cat.contains('Music')) return Icons.music_note;
-    if (cat.contains('Divertissement')) return Icons.tv;
-    return Icons.live_tv;
-  }
 }
 
 class _CategoryCard extends StatelessWidget {
@@ -805,84 +832,4 @@ class _CountedCat {
   const _CountedCat({required this.cat, required this.count});
 }
 
-// ═══════════════════════════════════════════
-//  IPTV SCREEN
-// ═══════════════════════════════════════════
 
-class IptvScreen extends StatefulWidget {
-  const IptvScreen({super.key});
-
-  @override
-  State<IptvScreen> createState() => _IptvScreenState();
-}
-
-class _IptvScreenState extends State<IptvScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF11111B),
-      body: Column(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Text(
-                    'Chaînes IPTV',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-                  ),
-                  const Spacer(),
-                  Consumer<TvProvider>(
-                    builder: (context, provider, _) {
-                      return Row(
-                        children: [
-                          _metric('Chaînes', provider.channels.length),
-                          const SizedBox(width: 6),
-                          _metric('Pays', provider.countries.length),
-                          const SizedBox(width: 6),
-                          _metric('Catégories', provider.categories.length),
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          const ChannelFilters(),
-          const SizedBox(height: 4),
-          const Expanded(child: ChannelGrid()),
-        ],
-      ),
-    );
-  }
-
-  Widget _metric(String label, int value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2E),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            '$value',
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 16, fontWeight: FontWeight.w700),
-          ),
-          Text(
-            label.toUpperCase(),
-            style: const TextStyle(fontSize: 8, letterSpacing: 1, color: Colors.white54),
-          ),
-        ],
-      ),
-    );
-  }
-}

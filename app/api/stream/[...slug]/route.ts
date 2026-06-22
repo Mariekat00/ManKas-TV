@@ -3,53 +3,29 @@ import { NextRequest } from "next/server";
 export const runtime = "nodejs";
 
 const ALLOWED_HOSTS = [
+  // ── Sports ──
   "live.akamized.net",
-  "cdn77.org",
-  "cloudfront.net",
-  "videos-fms.jwpltx.com",
-  "cloudflare.com",
-  "live.medialab.ma",
-  "live.media.ma",
-  "b4a5d5d5b5e5f5g5h5i5j5k5l5m5n5o5p5q5r5s5t5u5v5w5x5y5z5.alkass.net",
-  "live.alkass.net",
-  "6cloud.fr",
-  "nrjaudio.fm",
-  "cgtn.com",
-  "dailymotion.com",
-  "youtube.com",
-  "twitch.tv",
-  "jwpcdn.com",
-  "jwpltx.com",
-  "amagi.tv",
-  "23.237.104.106",
-  // World Cup 2026 broadcasters
-  "queazified.co.uk",
-  "canlitvapp.com",
-  "80.194.62.172",
-  "151.80.18.177",
-  "adriatelekom.com",
-  "ard-mcdn.de",
-  "138.121.15.230",
-  "thetvapp.to",
-  "38.75.136.137",
-  "tvsen7.aynaott.com",
-  "190.11.225.124",
-  "162.19.255.233",
-  "mcdn.br.de",
-  "hopslan.com",
-  "filegear-sg.me",
+  "1657061170.rsc.cdn77.org",
+  "nbculocallive.akamaized.net",
+  "lightning-tracesport-samsungau.amagi.tv",
+  "bein-xtra-bein.amagi.tv",
+  "dc1644a9jazgj.cloudfront.net",
+  "d71gqtnep83vb.cloudfront.net",
+  // ── LiveMedia.ma (Arryadia) ──
+  "stream-lb.livemediama.com",
+  // ── World Cup 2026 ──
+  "liveeu-gcp.alkassdigital.net",
+  "a.files.bbci.co.uk",
   "daserste-live.ard-mcdn.de",
-  "streamup.eu",
-  "iptv-playoutcenter.de",
-  "originstream12.rai.it",
-  "aloula-redirect.vercel.app",
-  "multistream.it",
-  "softwarecreation.it",
-  "3catdirectes.cat",
-  "190.60.40.34",
-  "45.170.130.224",
+  // ── Other ──
+  "raw.githubusercontent.com",
+  "30a-tv.com",
+  "streamtv.as3sport.online",
+  "5c7b683162943.streamlock.net",
+  "streams2.sofast.tv",
+  "na.linear.zype.com",
+  "videos-fms.jwpltx.com",
   "d4whmvwm0rdvi.cloudfront.net",
-  "cors-proxy.cooks.fyi",
   "africa24.vedge.infomaniak.com",
   "goldenboy.duckhunting.playout.vju.tv",
   "rpn.bozztv.com",
@@ -59,6 +35,16 @@ const ALLOWED_HOSTS = [
   "di-g7ij0rwh.vo.lswcdn.net",
   "distribution.sportitalialive.it",
   "streamfree.app",
+  // ── IP addresses (keep as-is) ──
+  "23.237.104.106",
+  "80.194.62.172",
+  "151.80.18.177",
+  "138.121.15.230",
+  "38.75.136.137",
+  "190.11.225.124",
+  "162.19.255.233",
+  "190.60.40.34",
+  "45.170.130.224",
 ];
 
 function isAllowedHost(host: string): boolean {
@@ -81,7 +67,7 @@ export async function GET(
   const segments = resolvedParams.slug;
 
   if (segments.length === 0) {
-    return new Response("Missing URL path", { status: 400 });
+    return Response.json({ error: "Missing URL path" }, { status: 400 });
   }
 
   const encodedHost = segments[0];
@@ -91,11 +77,11 @@ export async function GET(
     const padded = std + "=".repeat((4 - (std.length % 4)) % 4);
     host = atob(padded);
   } catch {
-    return new Response("Invalid host encoding", { status: 400 });
+    return Response.json({ error: "Invalid host encoding" }, { status: 400 });
   }
 
   if (!isAllowedHost(host)) {
-    return new Response("Host not allowed", { status: 403 });
+    return Response.json({ error: "Host not allowed" }, { status: 403 });
   }
 
   const remainingPath = segments.slice(1).join("/");
@@ -110,7 +96,7 @@ export async function GET(
     });
 
     if (!upstream.ok) {
-      return new Response(`Upstream ${upstream.status}`, { status: upstream.status });
+      return Response.json({ error: `Upstream returned ${upstream.status}` }, { status: upstream.status });
     }
 
     const contentType = upstream.headers.get("content-type") ?? "application/octet-stream";
@@ -123,6 +109,6 @@ export async function GET(
 
     return new Response(body, { status: 200, headers });
   } catch {
-    return new Response("Proxy fetch failed", { status: 502 });
+    return Response.json({ error: "Proxy fetch failed" }, { status: 502 });
   }
 }

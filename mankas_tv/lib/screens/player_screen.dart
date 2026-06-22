@@ -1,9 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:provider/provider.dart';
+import '../models/channel.dart';
 import '../providers/tv_provider.dart';
 import '../services/notification_service.dart';
+import '../utils/app_strings.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key});
@@ -13,19 +18,25 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver {
+  static const _pipChannel = MethodChannel('com.mankas.mankas_tv/pip');
+
   late final Player _player;
   late final VideoController _controller;
   bool _isInitialized = false;
   String? _error;
+  StreamSubscription? _errorSub;
+  bool _isFullscreen = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _player = Player();
+    _player = Player(
+      configuration: PlayerConfiguration(bufferSize: 150 * 1024 * 1024),
+    );
     _controller = VideoController(_player);
-    _player.stream.error.listen((e) {
-      if (mounted) setState(() => _error = 'Erreur de lecture : $e');
+    _errorSub = _player.stream.error.listen((e) {
+      if (mounted) setState(() => _error = 'Playback error: $e');
     });
     _initPlayer();
   }
@@ -65,14 +76,14 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
 
       if (url.contains('youtube.com') || url.contains('youtu.be')) {
         setState(() {
-          _error = 'Les flux YouTube s\'ouvrent dans le navigateur. URL : $url';
+          _error = 'YouTube streams open in the browser. URL: $url';
         });
         return;
       }
 
       if (url.contains('twitch.tv')) {
         setState(() {
-          _error = 'Les flux Twitch s\'ouvrent dans le navigateur. URL : $url';
+          _error = 'Twitch streams open in the browser. URL: $url';
         });
         return;
       }
@@ -96,7 +107,34 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
         _retryingForceSeekable = false;
         return;
       }
-      setState(() => _error = 'Échec du chargement du flux : $e');
+      setState(() => _error = 'Failed to load stream: $e');
+    }
+  }
+
+  Future<void> _enterPip() async {
+    if (Theme.of(context).platform == TargetPlatform.android) {
+      try {
+        await _pipChannel.invokeMethod('enterPictureInPicture');
+      } catch (_) {}
+    }
+  }
+
+  void _toggleFullscreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+    if (_isFullscreen) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    } else {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
     }
   }
 
@@ -104,65 +142,90 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     NotificationService().cancelAll();
+    _errorSub?.cancel();
     _player.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TvProvider>(
-      builder: (context, provider, _) {
-        final channel = provider.selectedChannel;
+    final channel = context.select<TvProvider, Channel?>((p) => p.selectedChannel);
 
-        return Scaffold(
+    return Scaffold(
           backgroundColor: Colors.black,
-          body: Column(
-            children: [
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      if (channel != null) ...[
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            channel.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+          body: _isFullscreen
+              ? _buildPlayer()
+              : Column(
+              children: [
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
                         ),
-                        Text(
-                          [channel.category, channel.country, channel.language]
-                              .where((e) => e != null && e.isNotEmpty)
-                              .join(' / '),
-                          style: TextStyle(
-                            color: Colors.white.withAlpha(128),
-                            fontSize: 12,
+                        if (channel != null) ...[
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              channel.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
+                          Text(
+                            [channel.category, channel.country, channel.language]
+                                .where((e) => e != null && e.isNotEmpty)
+                                .join(' / '),
+                            style: TextStyle(
+                              color: Colors.white.withAlpha(128),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                        if (channel != null)
+                          IconButton(
+                            icon: const Icon(Icons.picture_in_picture_alt, color: Colors.white),
+                            onPressed: _enterPip,
+                          ),
+                        if (channel != null)
+                          IconButton(
+                            icon: const Icon(Icons.share, color: Colors.white),
+                            onPressed: () {
+                              Share.share(
+                                'Regarde "${channel.name}" sur ManKas TV !\n${channel.streamUrl}',
+                              );
+                            },
+                          ),
+                        IconButton(
+                          icon: Icon(
+                            _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                            color: Colors.white,
+                          ),
+                          onPressed: _toggleFullscreen,
                         ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: _buildPlayer(),
-              ),
-            ],
-          ),
+                Expanded(
+                  child: _buildPlayer(),
+                ),
+              ],
+            ),
         );
-      },
-    );
   }
 
   Widget _buildPlayer() {
@@ -180,10 +243,27 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white70),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => _initPlayer(),
-                child: const Text('Réessayer'),
+                child: Text(AppStrings.of(context).retry),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () {
+                  final provider = context.read<TvProvider>();
+                  final channels = provider.channels;
+                  final current = provider.selectedChannel;
+                  if (current != null) {
+                    final idx = channels.indexOf(current);
+                    if (idx >= 0 && idx < channels.length - 1) {
+                      provider.setSelectedChannel(channels[idx + 1]);
+                      _initPlayer();
+                    }
+                  }
+                },
+                icon: const Icon(Icons.skip_next, color: Colors.white54),
+                label: Text(AppStrings.of(context).nextChannel, style: const TextStyle(color: Colors.white54)),
               ),
             ],
           ),
@@ -192,21 +272,28 @@ class _PlayerScreenState extends State<PlayerScreen> with WidgetsBindingObserver
     }
 
     if (!_isInitialized) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: Colors.white54),
-            SizedBox(height: 16),
-            Text('Chargement du flux...', style: TextStyle(color: Colors.white54)),
+            const CircularProgressIndicator(color: Colors.white54),
+            const SizedBox(height: 16),
+            Text('Loading stream...', style: const TextStyle(color: Colors.white54)),
           ],
         ),
       );
     }
 
-    return Video(
-      controller: _controller,
-      controls: MaterialVideoControls,
+    return GestureDetector(
+      onTap: () {
+        if (_isFullscreen) {
+          _toggleFullscreen();
+        }
+      },
+      child: Video(
+        controller: _controller,
+        controls: MaterialVideoControls,
+      ),
     );
   }
 }

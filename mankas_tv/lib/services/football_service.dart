@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/football_match.dart';
 
@@ -15,7 +16,9 @@ class FootballService {
             .map((g) => FootballMatch.fromJson(g as Map<String, dynamic>))
             .toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('FootballService.getMatches failed: $e');
+    }
     return [];
   }
 
@@ -29,7 +32,9 @@ class FootballService {
             .map((g) => FootballGroup.fromJson(g as Map<String, dynamic>))
             .toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('FootballService.getGroups failed: $e');
+    }
     return [];
   }
 
@@ -47,7 +52,9 @@ class FootballService {
         }
         return map;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('FootballService.getTeamNames failed: $e');
+    }
     return {};
   }
 }

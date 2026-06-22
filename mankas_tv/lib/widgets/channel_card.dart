@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
+import '../utils/category_theme.dart';
 
 class ChannelCard extends StatelessWidget {
   final Channel channel;
@@ -16,29 +17,9 @@ class ChannelCard extends StatelessWidget {
     required this.onFavoriteToggle,
   });
 
-  Color _categoryColor() {
-    final cat = channel.category ?? '';
-    if (cat.contains('World Cup') || cat.contains('FIFA')) return const Color(0xFFD4AF37);
-    if (cat == 'Sports') return const Color(0xFF22C55E);
-    if (cat == 'Divertissement') return const Color(0xFFA855F7);
-    if (cat == 'Actualités') return const Color(0xFF3B82F6);
-    if (cat == 'Musique') return const Color(0xFFEC4899);
-    return const Color(0xFF6366F1);
-  }
-
-  IconData _categoryIcon() {
-    final cat = channel.category ?? '';
-    if (cat.contains('World Cup') || cat.contains('FIFA')) return Icons.sports_soccer;
-    if (cat == 'Sports') return Icons.sports;
-    if (cat == 'Divertissement') return Icons.tv;
-    if (cat == 'Actualités') return Icons.public;
-    if (cat == 'Musique') return Icons.music_note;
-    return Icons.live_tv;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final color = _categoryColor();
+    final color = categoryColor(channel.category);
 
     return GestureDetector(
       onTap: onTap,
@@ -138,7 +119,7 @@ class ChannelCard extends StatelessWidget {
           color: color.withAlpha(51),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(_categoryIcon(), size: 28, color: color),
+        child: Icon(categoryIcon(channel.category), size: 28, color: color),
       ),
     );
   }

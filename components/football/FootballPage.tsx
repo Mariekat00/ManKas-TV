@@ -6,6 +6,8 @@ import { MatchCard } from "./MatchCard";
 import { GroupStandings } from "./GroupStandings";
 import { MatchSchedule } from "./MatchSchedule";
 import { Trophy, Calendar, BarChart3, Loader2 } from "lucide-react";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 type Tab = "today" | "standings" | "schedule";
 
@@ -16,176 +18,130 @@ export function FootballPage() {
   const [teams, setTeams] = useState<Record<string, FootballTeam>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const locale = useTvStore((s) => s.locale);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [gamesRes, groupsRes, teamsRes] = await Promise.all([
-          fetch("https://worldcup26.ir/get/games"),
-          fetch("https://worldcup26.ir/get/groups"),
-          fetch("https://worldcup26.ir/get/teams"),
+        const [matchRes, groupRawRes, teamRawRes] = await Promise.all([
+          fetch("https://worldcup26.ir/api/matches"),
+          fetch("https://worldcup26.ir/api/groups"),
+          fetch("https://worldcup26.ir/api/teams"),
         ]);
-        if (!gamesRes.ok || !groupsRes.ok || !teamsRes.ok) throw new Error("Failed to fetch");
-        const gamesData = await gamesRes.json();
-        const groupsData = await groupsRes.json();
-        const teamsData = await teamsRes.json();
-        setMatches(gamesData.games || gamesData);
-        const teamsMap: Record<string, FootballTeam> = {};
-        for (const t of teamsData.teams || teamsData) {
-          teamsMap[t.id] = t;
-        }
-        setTeams(teamsMap);
 
-        const rawGroups = groupsData.groups || groupsData;
-        const transformedGroups: FootballGroup[] = rawGroups.map((g: Record<string, unknown>) => ({
-          id: String(g._id || g.id || ""),
-          name: String(g.name || ""),
-          teams: ((g.teams || []) as Record<string, unknown>[]).map((t) => ({
-            team_id: String(t.team_id || t.id || ""),
-            team_name_en: teamsMap[String(t.team_id || t.id)]?.name_en || `Team #${t.team_id}`,
-            played: Number(t.mp ?? t.played ?? 0),
-            win: Number(t.w ?? t.win ?? 0),
-            draw: Number(t.d ?? t.draw ?? 0),
-            loss: Number(t.l ?? t.loss ?? 0),
-            goals_for: Number(t.gf ?? t.goals_for ?? 0),
-            goals_against: Number(t.ga ?? t.goals_against ?? 0),
-            points: Number(t.pts ?? t.points ?? 0),
-          })),
-        }));
-        setGroups(transformedGroups);
+        const matchData = await matchRes.json();
+        const groupRaw = await groupRawRes.json();
+        const teamRaw = await teamRawRes.json();
+
+        const groupMap: Record<string, FootballGroup> = {};
+        for (const g of groupRaw?.data ?? []) {
+          const name = g.name?.replace("Group ", "") ?? "?";
+          groupMap[name] = {
+            id: g.id,
+            name,
+            teams: g.teams?.map((t: { team_id: string; played: string; win: string; draw: string; lose: string; goals_for: string; goals_against: string; points: string }) => ({
+              team_id: t.team_id,
+              played: Number(t.played),
+              win: Number(t.win),
+              draw: Number(t.draw),
+              lose: Number(t.lose),
+              goals_for: Number(t.goals_for),
+              goals_against: Number(t.goals_against),
+              points: Number(t.points),
+            })) ?? [],
+          };
+        }
+
+        setMatches(matchData?.data ?? []);
+        setGroups(Object.values(groupMap));
+        setTeams(teamRaw?.data ?? {});
       } catch {
-        setError("Impossible de charger les données de la Coupe du Monde.");
+        setError(t(locale, "football.error"));
       } finally {
         setLoading(false);
       }
     }
+
     fetchData();
-  }, []);
-
-  const now = new Date();
-  const todayStr = `${String(now.getMonth() + 1).padStart(2, "0")}/${String(now.getDate()).padStart(2, "0")}/${now.getFullYear()}`;
-
-  const liveMatches = matches.filter(
-    (m) =>
-      m.time_elapsed !== "notstarted" &&
-      m.time_elapsed !== "finished" &&
-      m.finished !== "TRUE"
-  );
+  }, [locale]);
 
   const todayMatches = matches.filter((m) => {
-    const matchDate = m.local_date.split(" ")[0];
+    const todayStr = new Date().toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    }).replace(/\//g, "/");
+    const matchDate = m.local_date?.split(" ")[0];
     return matchDate === todayStr;
   });
 
-  const upcomingMatches = matches
-    .filter(
-      (m) =>
-        m.time_elapsed === "notstarted" &&
-        (m.finished === "FALSE" || m.finished === "false")
-    )
-    .sort((a, b) => a.local_date.localeCompare(b.local_date))
-    .slice(0, 8);
-
-  const tabs = [
-    { id: "today" as Tab, label: "Aujourd'hui", icon: Trophy },
-    { id: "standings" as Tab, label: "Classements", icon: BarChart3 },
-    { id: "schedule" as Tab, label: "Calendrier", icon: Calendar },
+  const tabs: { id: Tab; icon: typeof Trophy; labelKey: string }[] = [
+    { id: "today", icon: Trophy, labelKey: "football.today" },
+    { id: "standings", icon: BarChart3, labelKey: "football.standings" },
+    { id: "schedule", icon: Calendar, labelKey: "football.schedule" },
   ];
 
   if (loading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-accent" />
+      <div className="mx-auto max-w-5xl px-4 py-12 text-center">
+        <Loader2 size={32} className="mx-auto animate-spin text-muted" />
+        <p className="mt-4 text-sm text-muted">{t(locale, "common.loading")}</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-96 items-center justify-center">
+      <div className="mx-auto max-w-5xl px-4 py-12 text-center">
         <p className="text-muted">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          <span className="mr-2">⚽</span>
-          FIFA World Cup 2026
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">
+          <Trophy className="mr-2 inline-block text-yellow-500" size={28} />
+          {t(locale, "football.title")}
         </h1>
-        <p className="mt-1 text-sm text-muted">
-          {matches.length} matchs · 12 groupes · USA, Mexique & Canada
+        <p className="mt-2 text-sm text-muted">
+          {t(locale, "football.subtitle")}
         </p>
       </div>
 
-      <div className="mb-6 flex gap-1 rounded-lg border border-border bg-panel p-1">
-        {tabs.map((t) => {
-          const Icon = t.icon;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition ${
-                tab === t.id
-                  ? "bg-accent text-white"
-                  : "text-muted hover:bg-panel-strong hover:text-foreground"
-              }`}
-            >
-              <Icon size={16} />
-              {t.label}
-            </button>
-          );
-        })}
+      <div className="mb-6 flex gap-2 border-b border-border">
+        {tabs.map(({ id, icon: Icon, labelKey }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition ${
+              tab === id
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:text-foreground"
+            }`}
+          >
+            <Icon size={16} aria-hidden="true" />
+            {t(locale, labelKey)}
+          </button>
+        ))}
       </div>
 
       {tab === "today" && (
         <div>
-          {liveMatches.length > 0 && (
-            <section className="mb-8">
-              <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-                <span className="size-2 rounded-full bg-red-500 animate-pulse" />
-                En direct
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {liveMatches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {todayMatches.length > 0 && (
-            <section className="mb-8">
-              <h2 className="mb-4 text-lg font-semibold">
-                Matchs du jour ({todayMatches.length})
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {todayMatches.map((match) => (
-                  <MatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {liveMatches.length === 0 && todayMatches.length === 0 && (
-            <section className="mb-8">
-              <h2 className="mb-4 text-lg font-semibold">
-                Aucun match en cours aujourd&apos;hui
-              </h2>
-            </section>
-          )}
-
-          <section>
-            <h2 className="mb-4 text-lg font-semibold">Prochains matchs</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {upcomingMatches.map((match) => (
-                <MatchCard key={match.id} match={match} />
+          <h2 className="mb-4 text-lg font-semibold">
+            {t(locale, "football.matches.today")} ({todayMatches.length})
+          </h2>
+          {todayMatches.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {todayMatches.map((m) => (
+                <MatchCard key={m.id} match={m} />
               ))}
             </div>
-          </section>
+          ) : (
+            <p className="py-12 text-center text-muted">{t(locale, "football.no.matches")}</p>
+          )}
         </div>
       )}
 

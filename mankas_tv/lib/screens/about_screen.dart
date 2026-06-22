@@ -1,5 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../utils/app_strings.dart';
+
+const _appVersion = '1.0.0';
+const _developerName = 'Moïse Manda';
+const _developerCompany = 'ManKas Corporation';
+const _developerBio = 'Graphiste designer, développeur web et mobile, fondateur de ManKas Corporation.';
+const _phone = '+243 974 037 169';
+const _phoneUri = 'tel:+243974037169';
+const _email = 'moisemanda2000@gmail.com';
+const _emailUri = 'mailto:moisemanda2000@gmail.com';
+const _whatsappUrl = 'https://wa.me/message/J7SLDL3BFZFGI1';
+const _telegramUrl = 'https://t.me/MANKAS1';
+const _linkedinUrl = 'https://www.linkedin.com/in/moïse-manda-499982218';
+const _instagramUrl = 'https://www.instagram.com/mankascorporation';
+const _githubUrl = 'https://github.com/Mariekat00';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -10,7 +25,7 @@ class AboutScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF11111B),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('À propos', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(AppStrings.of(context).about, style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -31,9 +46,9 @@ class AboutScreen extends StatelessWidget {
                     child: const Icon(Icons.info_outline, color: Color(0xFF6366F1), size: 36),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'À propos de l\'application',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    AppStrings.of(context).about,
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -41,58 +56,58 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Présentation
-            _sectionTitle('Présentation'),
+            _sectionTitle('Overview'),
             _card(
               child: const Text(
-                'ManKas TV est une application conçue pour offrir une expérience streaming simple, rapide et efficace. Elle permet aux utilisateurs de regarder leurs chaînes IPTV favorites, de découvrir des matchs en direct et de profiter d\'une interface moderne adaptée aux appareils mobiles.',
+                'ManKas TV is designed to offer a simple, fast, and efficient streaming experience. It lets users watch their favorite IPTV channels, discover live matches, and enjoy a modern interface optimized for mobile devices.',
                 style: TextStyle(color: Colors.white70, height: 1.6),
               ),
             ),
             const SizedBox(height: 24),
 
             // Fonctionnalités
-            _sectionTitle('Fonctionnalités principales'),
+            _sectionTitle('Features'),
             _card(
               child: Column(
                 children: [
-                  _feature('📺', 'Plus de 4500 chaînes IPTV publiques'),
-                  _feature('⚽', 'Matchs en direct via StreamFree'),
-                  _feature('🏆', 'Suivi FIFA World Cup 2026'),
-                  _feature('❤️', 'Système de favoris'),
-                  _feature('🔍', 'Recherche par nom, pays, langue'),
-                  _feature('🎨', 'Thème sombre / clair'),
-                  _feature('📱', 'Application mobile Flutter'),
-                  _feature('🌐', 'Version web Next.js'),
+                  _feature('📺', '4500+ public IPTV channels'),
+                  _feature('⚽', 'Live matches via StreamFree'),
+                  _feature('🏆', 'FIFA World Cup 2026 tracking'),
+                  _feature('❤️', 'Favorites system'),
+                  _feature('🔍', 'Search by name, country, language'),
+                  _feature('🎨', 'Dark / Light theme'),
+                  _feature('📱', 'Flutter mobile app'),
+                  _feature('🌐', 'Next.js web version'),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // Développeur
-            _sectionTitle('Développeur'),
+            _sectionTitle('Developer'),
             _card(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Moïse Manda', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text(_developerName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  const Text('ManKas Corporation', style: TextStyle(color: Color(0xFF6366F1), fontSize: 13)),
+                  Text(_developerCompany, style: const TextStyle(color: Color(0xFF6366F1), fontSize: 13)),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Graphiste designer, développeur web et mobile, fondateur de ManKas Corporation.',
-                    style: TextStyle(color: Colors.white70, height: 1.5),
+                  Text(
+                    _developerBio,
+                    style: const TextStyle(color: Colors.white70, height: 1.5),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                      _skillTag('Développement Flutter'),
-                      _skillTag('Développement Web'),
-                      _skillTag('Design graphique'),
-                      _skillTag('Intelligence artificielle'),
-                      _skillTag('Formation informatique'),
-                      _skillTag('Solutions numériques'),
+                  _skillTag('Flutter Development'),
+                  _skillTag('Web Development'),
+                  _skillTag('Graphic Design'),
+                  _skillTag('Artificial Intelligence'),
+                  _skillTag('IT Training'),
+                  _skillTag('Digital Solutions'),
                     ],
                   ),
                 ],
@@ -101,7 +116,7 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ManKas Corporation
-            _sectionTitle('ManKas Corporation'),
+            _sectionTitle('About ManKas Corporation'),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -113,7 +128,7 @@ class AboutScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const Text(
-                    '"L\'innovation créatif, rapide et efficace"',
+                    '"Creative, fast, and effective innovation"',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -123,46 +138,46 @@ class AboutScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  _serviceItem(Icons.phone_android, 'Développement d\'applications mobiles'),
-                  _serviceItem(Icons.language, 'Création de sites web'),
-                  _serviceItem(Icons.qr_code, 'Solutions QR Code'),
-                  _serviceItem(Icons.palette, 'Design graphique'),
-                  _serviceItem(Icons.school, 'Formation informatique'),
-                  _serviceItem(Icons.lightbulb_outline, 'Conseil numérique'),
+                  _serviceItem(Icons.phone_android, 'Mobile app development'),
+                  _serviceItem(Icons.language, 'Website creation'),
+                  _serviceItem(Icons.qr_code, 'QR Code solutions'),
+                  _serviceItem(Icons.palette, 'Graphic design'),
+                  _serviceItem(Icons.school, 'IT training'),
+                  _serviceItem(Icons.lightbulb_outline, 'Digital consulting'),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // Contact
-            _sectionTitle('Contact'),
-            _contactTile(Icons.phone, 'Téléphone', '+243 974 037 169', () => _launchUrl('tel:+243974037169')),
+            _sectionTitle('Contact'), // keep English
+            _contactTile(Icons.phone, 'Phone', _phone, () => _launchUrl(_phoneUri)),
             const SizedBox(height: 8),
-            _contactTile(Icons.email, 'Email', 'moisemanda2000@gmail.com', () => _launchUrl('mailto:moisemanda2000@gmail.com')),
+            _contactTile(Icons.email, 'Email', _email, () => _launchUrl(_emailUri)),
             const SizedBox(height: 24),
 
             // Réseaux sociaux
-            _sectionTitle('Réseaux sociaux'),
-            _socialTile('WhatsApp', 'https://wa.me/message/J7SLDL3BFZFGI1', Colors.green),
+            _sectionTitle('Social Networks'),
+            _socialTile('WhatsApp', _whatsappUrl, Colors.green),
             const SizedBox(height: 8),
-            _socialTile('Telegram', 'https://t.me/MANKAS1', Colors.blue),
+            _socialTile('Telegram', _telegramUrl, Colors.blue),
             const SizedBox(height: 8),
-            _socialTile('LinkedIn', 'https://www.linkedin.com/in/moïse-manda-499982218', Colors.blue.shade700),
+            _socialTile('LinkedIn', _linkedinUrl, Colors.blue.shade700),
             const SizedBox(height: 8),
-            _socialTile('Instagram', 'https://www.instagram.com/mankascorporation', Colors.pink),
+            _socialTile('Instagram', _instagramUrl, Colors.pink),
             const SizedBox(height: 8),
-            _socialTile('GitHub', 'https://github.com/Mariekat00', Colors.white),
+            _socialTile('GitHub', _githubUrl, Colors.white),
             const SizedBox(height: 32),
 
             // Footer
             Center(
               child: Column(
                 children: [
-                  const Text('Version 1.0.0', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                  Text('Version $_appVersion', style: const TextStyle(color: Colors.white54, fontSize: 13)),
                   const SizedBox(height: 4),
-                  const Text(
-                    '© 2026 ManKas Corporation. Tous droits réservés.',
-                    style: TextStyle(color: Colors.white38, fontSize: 12),
+                  Text(
+                    '© 2026 $_developerCompany. All rights reserved.',
+                    style: const TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 ],
               ),

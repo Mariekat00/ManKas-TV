@@ -15,7 +15,7 @@ class FootballMatch {
   final String timeElapsed;
   final String type;
 
-  const FootballMatch({
+  FootballMatch({
     required this.id,
     required this.homeTeamId,
     required this.awayTeamId,
@@ -43,8 +43,8 @@ class FootballMatch {
 
   bool get hasStarted => timeElapsed != 'notstarted';
 
-  String get datePart => localDate.split(' ').first;
-  String get timePart => localDate.split(' ').length > 1 ? localDate.split(' ').last : '';
+  late final String datePart = localDate.split(' ').first;
+  late final String timePart = localDate.split(' ').length > 1 ? localDate.split(' ').last : '';
 
   String get statusLabel {
     if (isFinished) return 'Terminé';

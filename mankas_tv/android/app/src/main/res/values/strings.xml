@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_iptv_short">IPTV</string>
+    <string name="shortcut_iptv_long">Open IPTV Channels</string>
+    <string name="shortcut_iptv_disabled">IPTV is unavailable</string>
+    <string name="shortcut_matches_short">Matches</string>
+    <string name="shortcut_matches_long">Open Live Matches</string>
+    <string name="shortcut_matches_disabled">Matches are unavailable</string>
+    <string name="shortcut_fav_short">Favorites</string>
+    <string name="shortcut_fav_long">Open Your Favorites</string>
+    <string name="shortcut_fav_disabled">Favorites are unavailable</string>
+</resources>

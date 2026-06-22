@@ -1,6 +1,8 @@
 "use client";
 
 import { Component, type ReactNode } from "react";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 type Props = {
   children: ReactNode;
@@ -24,17 +26,18 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const locale = useTvStore.getState().locale;
       return (
         this.props.fallback ?? (
           <div className="flex min-h-48 items-center justify-center">
             <div className="rounded-md border border-red-500/30 bg-red-950/80 p-6 text-center">
-              <p className="text-sm text-red-100">Something went wrong.</p>
+              <p className="text-sm text-red-100">{t(locale, "error.boundary")}</p>
               <button
                 type="button"
                 onClick={() => this.setState({ hasError: false, error: null })}
                 className="mt-3 rounded-md bg-accent px-4 py-2 text-xs font-medium text-white"
               >
-                Try again
+                {t(locale, "error.tryagain")}
               </button>
             </div>
           </div>

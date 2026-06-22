@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/channel.dart';
 
@@ -38,7 +39,8 @@ class StreamFreeService {
       }
 
       return channels;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('StreamFreeService.fetchLiveStreams failed: $e');
       return [];
     }
   }
@@ -49,9 +51,18 @@ class StreamFreeService {
     String emoji,
   ) async {
     if (items.isEmpty) return [];
-    final futures = items.map((s) => _processStream(s, category, 'Sports', emoji));
-    final results = await Future.wait(futures);
-    return results.whereType<Channel>().toList();
+    const batchSize = 5;
+    final results = <Channel>[];
+    for (int i = 0; i < items.length; i += batchSize) {
+      final batch = items.skip(i).take(batchSize);
+      final batchResults = await Future.wait(
+        batch.map((s) => _processStream(s, category, 'Sports', emoji)),
+      );
+      for (final r in batchResults) {
+        if (r != null) results.add(r);
+      }
+    }
+    return results;
   }
 
   static Future<Channel?> _processStream(
@@ -65,10 +76,7 @@ class StreamFreeService {
       if (streamKey.isEmpty) return null;
 
       final name = stream['name'] as String? ?? streamKey;
-      final league = stream['league'] as String? ?? '';
       final team1 = stream['team1'] as Map<String, dynamic>?;
-      final team2 = stream['team2'] as Map<String, dynamic>?;
-      final viewers = stream['viewers'] as int? ?? 0;
 
       // Fetch embed page to get auth tokens
       final tokens = await _fetchTokens(streamKey, category);
@@ -86,14 +94,7 @@ class StreamFreeService {
         logo = team1['logo'] as String;
       }
 
-      // Build display name
       final displayName = '$emoji $name';
-
-      // Build description
-      final desc = [league, if (viewers > 0) '$viewers spectateurs']
-          .where((e) => e.isNotEmpty)
-          .join(' · ');
-
       return Channel(
         id: 'sf-$streamKey',
         name: displayName,
@@ -103,7 +104,8 @@ class StreamFreeService {
         country: 'International',
         language: 'English',
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('StreamFreeService._processStream failed: $e');
       return null;
     }
   }
@@ -129,7 +131,8 @@ class StreamFreeService {
 
       final tokens = json.decode(jsonStr) as Map<String, dynamic>;
       return tokens;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('StreamFreeService._fetchTokens failed: $e');
       return null;
     }
   }
@@ -150,7 +153,8 @@ class StreamFreeService {
       if (qualities['2160p'] == true) return '2160p';
       if (qualities['540p'] == true) return '540p';
       return '720p';
-    } catch (_) {
+    } catch (e) {
+      debugPrint('StreamFreeService._getBestQuality failed: $e');
       return '720p';
     }
   }

@@ -1,5 +1,8 @@
 "use client";
 
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
+
 export default function ErrorPage({
   error,
   reset,
@@ -7,19 +10,21 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const locale = useTvStore((s) => s.locale);
+
   return (
     <div className="flex min-h-96 items-center justify-center">
       <div className="max-w-md rounded-md border border-red-500/30 bg-red-950/80 p-6 text-center">
-        <h2 className="text-lg font-semibold text-red-100">Something went wrong</h2>
+        <h2 className="text-lg font-semibold text-red-100">{t(locale, "error.boundary")}</h2>
         <p className="mt-2 text-sm text-red-200/80">
-          {error.message || "An unexpected error occurred."}
+          {error.message || t(locale, "error.boundary")}
         </p>
         <button
           type="button"
           onClick={reset}
           className="mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent/90"
         >
-          Try again
+          {t(locale, "error.tryagain")}
         </button>
       </div>
     </div>

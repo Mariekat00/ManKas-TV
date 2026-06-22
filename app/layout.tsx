@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import { ThemeController } from "@/components/layout/ThemeController";
+import { LocaleHtml } from "@/components/layout/LocaleHtml";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ManKas TV",
-  description: "Legal public IPTV streaming platform built with Next.js and Supabase.",
+  description: "Legal public IPTV streaming platform built with Next.js.",
 };
 
 export default function RootLayout({
@@ -45,8 +46,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground">
+      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
         <ThemeController />
+        <LocaleHtml />
         <AppShell>{children}</AppShell>
       </body>
     </html>

@@ -55,3 +55,6 @@ mankas_tv/.env
 mankas_tv/.env.*
 
 .vercel
+
+# secrets
+KEYS.md

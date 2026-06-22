@@ -7,6 +7,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   media_kit_libs_windows_video
   media_kit_video
   passkeys_windows
+  sentry_flutter
+  share_plus
   url_launcher_windows
   volume_controller
 )

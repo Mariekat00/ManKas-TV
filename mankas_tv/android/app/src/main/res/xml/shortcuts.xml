@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="iptv"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_iptv_short"
+        android:shortcutLongLabel="@string/shortcut_iptv_long"
+        android:shortcutDisabledMessage="@string/shortcut_iptv_disabled">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.mankas.mankas_tv"
+            android:targetClass="com.mankas.mankas_tv.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="matches"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_matches_short"
+        android:shortcutLongLabel="@string/shortcut_matches_long"
+        android:shortcutDisabledMessage="@string/shortcut_matches_disabled">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.mankas.mankas_tv"
+            android:targetClass="com.mankas.mankas_tv.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="favorites"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_fav_short"
+        android:shortcutLongLabel="@string/shortcut_fav_long"
+        android:shortcutDisabledMessage="@string/shortcut_fav_disabled">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.mankas.mankas_tv"
+            android:targetClass="com.mankas.mankas_tv.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

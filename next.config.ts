@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   images: {
@@ -31,7 +32,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https: http:",
               "media-src 'self' blob: https: http:",
               "frame-src https://www.youtube.com https://player.twitch.tv https://www.dailymotion.com",
-              "connect-src 'self' https: http:",
+              "connect-src 'self' https: http: https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
               "font-src 'self' data:",
             ].join("; "),
           },
@@ -41,4 +42,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig);

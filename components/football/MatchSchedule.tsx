@@ -3,12 +3,15 @@
 import { useState } from "react";
 import type { FootballMatch } from "@/types";
 import { MatchCard } from "./MatchCard";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 type RoundFilter = "all" | "group" | "r32" | "r16" | "qf" | "sf" | "final";
 
 export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
   const [roundFilter, setRoundFilter] = useState<RoundFilter>("all");
   const [selectedGroup, setSelectedGroup] = useState<string>("all");
+  const locale = useTvStore((s) => s.locale);
 
   const filteredMatches = matches.filter((m) => {
     if (roundFilter === "group" && m.type !== "group") return false;
@@ -26,12 +29,13 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
   ].sort();
 
   const rounds: { id: RoundFilter; label: string }[] = [
-    { id: "all", label: "Tous" },
-    { id: "group", label: "Groupes" },
+    { id: "all", label: t(locale, "football.all") },
+    { id: "group", label: t(locale, "football.groups") },
     { id: "r32", label: "⅛" },
     { id: "r16", label: "¼" },
     { id: "qf", label: "½" },
-    { id: "sf", label: "Finale" },
+    { id: "sf", label: t(locale, "football.semifinals") },
+    { id: "final", label: t(locale, "football.final") },
   ];
 
   const groupedByDate: Record<string, FootballMatch[]> = {};
@@ -44,7 +48,7 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
   function formatDate(dateStr: string): string {
     const [month, day, year] = dateStr.split("/");
     const d = new Date(Number(year), Number(month) - 1, Number(day));
-    return d.toLocaleDateString("fr-FR", {
+    return d.toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -81,7 +85,7 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
                 : "border border-border bg-panel text-muted hover:bg-panel-strong"
             }`}
           >
-            Tous les groupes
+            {t(locale, "football.all.groups")}
           </button>
           {groupLetters.map((g) => (
             <button
@@ -101,7 +105,7 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
       )}
 
       {sortedMatches.length === 0 ? (
-        <p className="py-12 text-center text-muted">Aucun match trouvé</p>
+        <p className="py-12 text-center text-muted">{t(locale, "football.no.matches.found")}</p>
       ) : (
         Object.entries(groupedByDate).map(([date, dateMatches]) => (
           <section key={date} className="mb-6">
@@ -118,7 +122,7 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
       )}
 
       <p className="mt-6 text-center text-xs text-muted">
-        {sortedMatches.length} matchs affichés · Données : worldcup26.ir
+        {sortedMatches.length} {t(locale, "football.matches.shown")} · worldcup26.ir
       </p>
     </div>
   );

@@ -3,21 +3,23 @@
 import Link from "next/link";
 import { Clock3, Heart, Home, Info, PlusCircle, Radio, Tv, Trophy, X } from "lucide-react";
 import { useTvStore } from "@/store/useTvStore";
-
-const navItems = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/live", label: "Matchs en Direct", icon: Radio },
-  { href: "/football", label: "FIFA World Cup 2026", icon: Trophy },
-  { href: "/#channels", label: "Chaînes IPTV", icon: Tv },
-  { href: "/#favorites", label: "Favoris", icon: Heart },
-  { href: "/#recent", label: "Récent", icon: Clock3 },
-  { href: "/about", label: "À propos", icon: Info },
-  { href: "/admin", label: "Admin", icon: PlusCircle },
-];
+import { t } from "@/lib/translations";
 
 export function Sidebar() {
   const sidebarOpen = useTvStore((state) => state.sidebarOpen);
   const setSidebarOpen = useTvStore((state) => state.setSidebarOpen);
+  const locale = useTvStore((state) => state.locale);
+
+  const navItems = [
+    { href: "/", labelKey: "nav.home", icon: Home },
+    { href: "/live", labelKey: "nav.live", icon: Radio },
+    { href: "/football", labelKey: "nav.worldcup", icon: Trophy },
+    { href: "/#channels", labelKey: "nav.iptv", icon: Tv },
+    { href: "/#favorites", labelKey: "nav.favorites", icon: Heart },
+    { href: "/#recent", labelKey: "nav.recent", icon: Clock3 },
+    { href: "/about", labelKey: "nav.about", icon: Info },
+    { href: "/admin", labelKey: "nav.admin", icon: PlusCircle },
+  ];
 
   return (
     <>
@@ -31,12 +33,12 @@ export function Sidebar() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">Navigation</span>
+              <span className="text-sm font-semibold">{t(locale, "nav.title")}</span>
               <button
                 type="button"
                 onClick={() => setSidebarOpen(false)}
                 className="flex size-8 items-center justify-center rounded-md text-muted hover:text-foreground"
-                aria-label="Close menu"
+                aria-label={t(locale, "nav.close")}
               >
                 <X size={18} />
               </button>
@@ -52,7 +54,7 @@ export function Sidebar() {
                     className="flex h-11 items-center gap-3 rounded-md px-3 text-sm text-muted transition hover:bg-panel-strong hover:text-foreground"
                   >
                     <Icon size={18} aria-hidden="true" />
-                    {item.label}
+                    {t(locale, item.labelKey)}
                   </Link>
                 );
               })}
@@ -72,13 +74,13 @@ export function Sidebar() {
                 className="flex h-11 items-center gap-3 rounded-md px-3 text-sm text-muted transition hover:bg-panel-strong hover:text-foreground"
               >
                 <Icon size={18} aria-hidden="true" />
-                {item.label}
+                {t(locale, item.labelKey)}
               </Link>
             );
           })}
 
           <div className="mt-auto rounded-md border border-border bg-background p-3 text-xs leading-5 text-muted">
-            Legal public streams only. Add verified channel URLs through Supabase or Admin.
+            {t(locale, "sidebar.disclaimer")}
           </div>
         </nav>
       </aside>

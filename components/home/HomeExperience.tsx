@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { Radio, Tv } from "lucide-react";
 import { ChannelFilters } from "@/components/channels/ChannelFilters";
@@ -10,17 +9,12 @@ import { FavoritesSection } from "@/components/home/FavoritesSection";
 import { VideoPlayer } from "@/components/player/VideoPlayer";
 import { useChannels } from "@/hooks/useChannels";
 import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 export function HomeExperience() {
   const { channels, filteredChannels, isLoading, error } = useChannels();
   const selectedChannel = useTvStore((state) => state.selectedChannel);
-  const setSelectedChannel = useTvStore((state) => state.setSelectedChannel);
-
-  useEffect(() => {
-    if (!selectedChannel && channels.length > 0) {
-      setSelectedChannel(channels[0]);
-    }
-  }, [channels, selectedChannel, setSelectedChannel]);
+  const locale = useTvStore((state) => state.locale);
 
   return (
     <div className="mx-auto flex max-w-[1800px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
@@ -30,14 +24,13 @@ export function HomeExperience() {
         <div className="flex flex-col justify-end gap-4">
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.22em] text-accent">
-              Public IPTV
+              {t(locale, "home.public.iptv")}
             </p>
             <h1 className="mt-3 max-w-2xl text-4xl font-semibold tracking-normal text-foreground sm:text-5xl">
               ManKas TV
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-              Stream verified public HLS channels, save favorites, and continue from your recent
-              history across devices.
+              {t(locale, "home.description")}
             </p>
           </div>
 
@@ -48,22 +41,22 @@ export function HomeExperience() {
               className="flex flex-col items-center gap-2 rounded-xl bg-red-500 p-5 text-white transition hover:bg-red-600"
             >
               <Radio size={28} />
-              <span className="text-sm font-bold">Matchs Live</span>
+              <span className="text-sm font-bold">{t(locale, "home.live")}</span>
             </Link>
             <a
               href="#channels"
               className="flex flex-col items-center gap-2 rounded-xl bg-accent p-5 text-white transition hover:opacity-90"
             >
               <Tv size={28} />
-              <span className="text-sm font-bold">Chaînes IPTV</span>
+              <span className="text-sm font-bold">{t(locale, "home.iptv")}</span>
             </a>
           </div>
 
           {/* Metrics */}
           <div className="grid grid-cols-3 gap-3">
-            <Metric label="Channels" value={channels.length} />
-            <Metric label="Countries" value={new Set(channels.map((item) => item.country).filter(Boolean)).size} />
-            <Metric label="Categories" value={new Set(channels.map((item) => item.category).filter(Boolean)).size} />
+            <Metric label={t(locale, "home.channels")} value={channels.length} />
+            <Metric label={t(locale, "home.countries")} value={new Set(channels.map((item) => item.country).filter(Boolean)).size} />
+            <Metric label={t(locale, "home.categories")} value={new Set(channels.map((item) => item.category).filter(Boolean)).size} />
           </div>
         </div>
       </section>

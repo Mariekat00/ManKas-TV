@@ -5,6 +5,7 @@ import { Maximize2, RefreshCw, RadioTower, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Channel } from "@/types";
 import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 import { getStreamProxyUrl } from "@/lib/proxy";
 
 function isYouTubeUrl(url: string): boolean {
@@ -91,14 +92,10 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
   const [loading, setLoading] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const setPlayerStatus = useTvStore((state) => state.setPlayerStatus);
+  const locale = useTvStore((state) => state.locale);
 
   const isEmbed = channel ? getEmbedUrl(channel.stream_url) : null;
   const [embedUrl, setEmbedUrl] = useState<string | null>(null);
-  const [muted, setMuted] = useState(false);
-
-  useEffect(() => {
-    setMuted(false);
-  }, [channel]);
 
   useEffect(() => {
     if (isEmbed) {
@@ -143,7 +140,7 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
       }
 
       if (!Hls.isSupported()) {
-        setError("This browser does not support HLS playback.");
+        setError(t(locale, "player.error.hls"));
         setPlayerStatus("error");
         setLoading(false);
         return;
@@ -175,7 +172,7 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
           return;
         }
 
-        setError("Stream failed to load. This channel may be offline or unavailable.");
+        setError(t(locale, "player.error.stream"));
         setPlayerStatus("error");
         setLoading(false);
         destroyHls();
@@ -189,7 +186,7 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
       currentVideo.removeAttribute("src");
       currentVideo.load();
     };
-  }, [channel, setPlayerStatus, volume, isEmbed]);
+  }, [channel, setPlayerStatus, volume, isEmbed, locale]);
 
   useEffect(() => {
     if (videoRef.current && !isEmbed) {
@@ -228,7 +225,7 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
                 <div className="absolute inset-0 flex items-center justify-center bg-black/60">
                   <div className="flex flex-col items-center gap-3">
                     <div className="size-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                    <p className="text-sm text-white/70">Loading stream...</p>
+                    <p className="text-sm text-white/70">{t(locale, "player.loading")}</p>
                   </div>
                 </div>
               )}
@@ -238,7 +235,7 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-muted">
             <RadioTower size={42} aria-hidden="true" />
-            <p className="text-sm">Select a channel to start streaming.</p>
+            <p className="text-sm">{t(locale, "player.select")}</p>
           </div>
         )}
 
@@ -251,10 +248,10 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
 
       <div className="flex flex-col gap-3 border-t border-white/10 bg-panel p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p className="truncate font-medium">{channel?.name ?? "No channel selected"}</p>
+          <p className="truncate font-medium">{channel?.name ?? t(locale, "player.no.channel")}</p>
           <p className="mt-1 truncate text-xs text-muted">
             {[channel?.category, channel?.country, channel?.language].filter(Boolean).join(" / ") ||
-              "Waiting for a stream"}
+              t(locale, "player.waiting")}
           </p>
         </div>
 
@@ -277,8 +274,8 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
               type="button"
               onClick={() => videoRef.current?.load()}
               className="flex size-10 items-center justify-center rounded-md border border-border text-muted hover:text-foreground"
-              title="Retry stream"
-              aria-label="Retry stream"
+              title={t(locale, "player.retry")}
+              aria-label={t(locale, "player.retry")}
             >
               <RefreshCw size={16} aria-hidden="true" />
             </button>
@@ -286,8 +283,8 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
               type="button"
               onClick={requestFullscreen}
               className="flex size-10 items-center justify-center rounded-md border border-border text-muted hover:text-foreground"
-              title="Fullscreen"
-              aria-label="Fullscreen"
+              title={t(locale, "player.fullscreen")}
+              aria-label={t(locale, "player.fullscreen")}
             >
               <Maximize2 size={16} aria-hidden="true" />
             </button>

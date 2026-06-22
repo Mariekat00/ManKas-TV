@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Radio, RefreshCw, Tv } from "lucide-react";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 type StreamFreeMatch = {
   id: string;
@@ -31,6 +33,7 @@ export function LiveMatchesPage() {
   const [matches, setMatches] = useState<StreamFreeMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const locale = useTvStore((s) => s.locale);
 
   const fetchMatches = async () => {
     setLoading(true);
@@ -40,7 +43,7 @@ export function LiveMatchesPage() {
       const data = await res.json();
       setMatches(data.channels || []);
     } catch {
-      setError("Impossible de charger les matchs live.");
+      setError(t(locale, "live.error"));
     } finally {
       setLoading(false);
     }
@@ -56,10 +59,10 @@ export function LiveMatchesPage() {
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Radio className="text-red-500" size={28} />
-            Matchs en Direct
+            {t(locale, "live.title")}
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Streams live provenant de StreamFree — football, UFC, basketball et plus
+            {t(locale, "live.subtitle")}
           </p>
         </div>
         <button
@@ -68,14 +71,14 @@ export function LiveMatchesPage() {
           className="flex items-center gap-2 rounded-lg border border-border bg-panel px-4 py-2 text-sm text-muted transition hover:bg-panel-strong hover:text-foreground disabled:opacity-50"
         >
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          Actualiser
+          {t(locale, "live.refresh")}
         </button>
       </div>
 
       {loading && matches.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-muted">
           <RefreshCw size={32} className="mb-4 animate-spin text-red-500" />
-          <p>Chargement des matchs live...</p>
+          <p>{t(locale, "live.loading")}</p>
         </div>
       )}
 
@@ -88,8 +91,8 @@ export function LiveMatchesPage() {
       {!loading && matches.length === 0 && !error && (
         <div className="flex flex-col items-center justify-center py-20 text-muted">
           <Tv size={48} className="mb-4 opacity-30" />
-          <p className="text-lg">Aucun match en direct</p>
-          <p className="mt-2 text-sm">Les matchs apparaissent ici quand ils sont live</p>
+          <p className="text-lg">{t(locale, "live.empty")}</p>
+          <p className="mt-2 text-sm">{t(locale, "live.empty.desc")}</p>
         </div>
       )}
 
@@ -104,10 +107,10 @@ export function LiveMatchesPage() {
             >
               <div className="mb-3 flex items-center gap-2">
                 <span className="rounded-md bg-red-500/20 px-2 py-0.5 text-xs font-bold text-red-400">
-                  LIVE
+                  {t(locale, "live.live")}
                 </span>
                 <span className="text-xs text-muted">
-                  {match.viewers > 0 ? `${match.viewers} spectateurs` : ""}
+                  {match.viewers > 0 ? `${match.viewers} ${t(locale, "live.viewers")}` : ""}
                 </span>
               </div>
               <h3 className="text-lg font-semibold text-foreground group-hover:text-red-400">

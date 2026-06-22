@@ -4,12 +4,13 @@ import '../services/channel_service.dart';
 import '../services/streamfree_service.dart';
 
 class TvProvider extends ChangeNotifier {
-  final ChannelService _service = ChannelService();
+  final ChannelService _service;
 
   List<Channel> _channels = [];
   List<Channel> _filteredChannels = [];
   List<Channel> _streamFreeChannels = [];
   List<String> _favorites = [];
+  List<String> _recentSearches = [];
   Channel? _selectedChannel;
   String _query = '';
   String _category = 'Tout';
@@ -18,10 +19,15 @@ class TvProvider extends ChangeNotifier {
   bool _isLoading = true;
   bool _isLoadingStreamFree = false;
 
+  static const _maxRecentSearches = 5;
+
+  TvProvider({ChannelService? service}) : _service = service ?? ChannelService();
+
   List<Channel> get channels => _channels;
   List<Channel> get filteredChannels => _filteredChannels;
   List<Channel> get streamFreeChannels => _streamFreeChannels;
   List<String> get favorites => _favorites;
+  List<String> get recentSearches => _recentSearches;
   Channel? get selectedChannel => _selectedChannel;
   String get query => _query;
   String get category => _category;
@@ -37,9 +43,9 @@ class TvProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Only load IPTV channels (not StreamFree)
     _channels = await _service.getChannels();
     _favorites = await _service.getFavorites();
+    _recentSearches = await _service.getRecentSearches();
     _applyFilters();
 
     if (_channels.isNotEmpty && _selectedChannel == null) {
@@ -68,6 +74,26 @@ class TvProvider extends ChangeNotifier {
   void setQuery(String value) {
     _query = value;
     _applyFilters();
+    notifyListeners();
+  }
+
+  Future<void> submitQuery(String value) async {
+    _query = value;
+    _applyFilters();
+    if (value.isNotEmpty) {
+      _recentSearches.remove(value);
+      _recentSearches.insert(0, value);
+      if (_recentSearches.length > _maxRecentSearches) {
+        _recentSearches = _recentSearches.sublist(0, _maxRecentSearches);
+      }
+      await _service.saveRecentSearches(_recentSearches);
+    }
+    notifyListeners();
+  }
+
+  Future<void> clearRecentSearches() async {
+    _recentSearches = [];
+    await _service.saveRecentSearches(_recentSearches);
     notifyListeners();
   }
 
@@ -104,7 +130,7 @@ class TvProvider extends ChangeNotifier {
           ch.name.toLowerCase().contains(q) ||
           (ch.country?.toLowerCase().contains(q) ?? false) ||
           (ch.language?.toLowerCase().contains(q) ?? false);
-      final matchesCategory = _category == 'Tout' || ch.category == _category;
+      final matchesCategory = _category == 'Tout' || (ch.category ?? 'Général') == _category;
       final matchesCountry = _country == 'Tout' || ch.country == _country;
       final matchesFavorites = !_showFavoritesOnly || _favorites.contains(ch.id);
       return matchesSearch && matchesCategory && matchesCountry && matchesFavorites;

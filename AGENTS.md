@@ -26,9 +26,17 @@ npm run lint         # ESLint
 # === Flutter ===
 cd mankas_tv
 flutter pub get      # Installer les dépendances
-flutter run          # Lancer l'app
+flutter run          # Lancer l'app (nécessite Developer Mode)
 flutter analyze      # Analyser le code
+flutter test         # Lancer les tests unitaires
 flutter build windows  # Build Windows
+
+# Build Android (contourne l'absence de symlinks)
+$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr'
+cd android
+.\gradlew.bat assembleDebug    # APK debug
+.\gradlew.bat assembleRelease  # APK release signé
+.\gradlew.bat bundleRelease    # AAB pour Play Store
 ```
 
 ## Structure Next.js
@@ -78,3 +86,15 @@ Le proxy `/api/stream/{host_base64}/{path}` encode le host en base64 dans le che
 
 ### Player Flutter
 Utilise `media_kit` (basé sur mpv/libmpv) pour la lecture HLS native. Les sources YouTube/Twitch sont affichées comme URLs à ouvrir dans un navigateur.
+
+### Build Release Android
+Le build nécessite `key.properties` dans `android/` et un keystore (`android/app/upload-keystore.jks`).
+Générer le keystore : `keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`
+
+`flutter build apk` échoue sur Windows sans Developer Mode (symlinks). Solution : utiliser Gradle directement via `gradlew.bat assembleRelease`.
+
+### Credentials
+Les credentials Supabase sont compilés dans le binaire via `--dart-define` en release. En debug, les fallbacks dans `lib/config.dart` sont utilisés.
+
+### Signature Release
+Le keystore et `key.properties` sont exclus du git via `.gitignore`.

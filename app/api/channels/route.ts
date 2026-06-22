@@ -57,6 +57,6 @@ const guaranteedChannels: Channel[] = [
 
 export async function GET() {
   return NextResponse.json({ channels: guaranteedChannels }, {
-    headers: { "Cache-Control": "no-store" },
+    headers: { "Cache-Control": "public, max-age=300" },
   });
 }

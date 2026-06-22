@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { LogIn, Menu, Moon, Sun, RadioTower, Search } from "lucide-react";
+import { LogIn, Menu, Moon, Sun, RadioTower, Search, Languages } from "lucide-react";
 import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 export function Navbar() {
   const query = useTvStore((state) => state.query);
@@ -11,6 +12,23 @@ export function Navbar() {
   const toggleTheme = useTvStore((state) => state.toggleTheme);
   const setSidebarOpen = useTvStore((state) => state.setSidebarOpen);
   const setAuthModalOpen = useTvStore((state) => state.setAuthModalOpen);
+  const locale = useTvStore((state) => state.locale);
+  const setLocale = useTvStore((state) => state.setLocale);
+  const addSearchHistory = useTvStore((state) => state.addSearchHistory);
+
+  function handleSearchChange(value: string) {
+    setQuery(value);
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && query.trim()) {
+      addSearchHistory(query.trim());
+    }
+  }
+
+  function toggleLocale() {
+    setLocale(locale === "en" ? "fr" : "en");
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/92 backdrop-blur">
@@ -26,8 +44,10 @@ export function Navbar() {
           <Search size={17} aria-hidden="true" />
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search channels, countries, languages"
+            onChange={(event) => handleSearchChange(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder={t(locale, "search.placeholder")}
+            aria-label={t(locale, "search.placeholder")}
             className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
           />
         </label>
@@ -35,10 +55,19 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={toggleLocale}
+            className="flex size-10 items-center justify-center rounded-md border border-border bg-panel text-muted hover:text-foreground"
+            title={locale === "en" ? "Français" : "English"}
+            aria-label={locale === "en" ? "Français" : "English"}
+          >
+            <Languages size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
             onClick={() => setAuthModalOpen(true)}
             className="flex size-10 items-center justify-center rounded-md border border-border bg-panel text-muted hover:text-foreground"
-            title="Sign in"
-            aria-label="Sign in"
+            title={t(locale, "sign.in")}
+            aria-label={t(locale, "sign.in")}
           >
             <LogIn size={18} aria-hidden="true" />
           </button>
@@ -46,14 +75,14 @@ export function Navbar() {
             href="/admin"
             className="hidden rounded-md border border-border px-3 py-2 text-sm text-muted transition hover:border-accent hover:text-foreground sm:block"
           >
-            Admin
+            {t(locale, "nav.admin")}
           </Link>
           <button
             type="button"
             onClick={toggleTheme}
             className="flex size-10 items-center justify-center rounded-md border border-border bg-panel text-muted hover:text-foreground"
-            title={theme === "dark" ? "Light mode" : "Dark mode"}
-            aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
+            title={theme === "dark" ? t(locale, "light.mode") : t(locale, "dark.mode")}
+            aria-label={theme === "dark" ? t(locale, "light.mode") : t(locale, "dark.mode")}
           >
             {theme === "dark" ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
           </button>
@@ -61,8 +90,8 @@ export function Navbar() {
             type="button"
             onClick={() => setSidebarOpen(true)}
             className="flex size-10 items-center justify-center rounded-md border border-border bg-panel text-muted hover:text-foreground lg:hidden"
-            title="Menu"
-            aria-label="Menu"
+            title={t(locale, "menu")}
+            aria-label={t(locale, "menu")}
           >
             <Menu size={18} aria-hidden="true" />
           </button>
@@ -74,8 +103,10 @@ export function Navbar() {
           <Search size={17} aria-hidden="true" />
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search channels"
+            onChange={(event) => handleSearchChange(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder={t(locale, "search.placeholder.mobile")}
+            aria-label={t(locale, "search.placeholder.mobile")}
             className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
           />
         </label>

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/channel.dart';
@@ -60,9 +61,9 @@ class ChannelService {
           language: c['language'],
         )).toList();
       }
-      print('Channel API returned ${response.statusCode}');
+      debugPrint('Channel API returned ${response.statusCode}');
     } catch (e) {
-      print('Channel API fetch failed: $e');
+      debugPrint('Channel API fetch failed: $e');
     }
     return [];
   }
@@ -93,6 +94,18 @@ class ChannelService {
       favorites.add(channelId);
     }
     await prefs.setStringList(_favoritesKey, favorites);
+  }
+
+  static const _recentSearchesKey = 'recent_searches';
+
+  Future<List<String>> getRecentSearches() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_recentSearchesKey) ?? [];
+  }
+
+  Future<void> saveRecentSearches(List<String> searches) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_recentSearchesKey, searches);
   }
 
 }

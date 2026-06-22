@@ -1,11 +1,16 @@
+"use client";
+
+import React from "react";
 import type { FootballMatch } from "@/types";
 import { getTeamFlag } from "@/lib/flags";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
-function getStatusLabel(match: FootballMatch): string {
-  if (match.finished === "TRUE" || match.finished === "true") return "Terminé";
-  if (match.time_elapsed === "HT") return "Mi-temps";
-  if (match.time_elapsed === "notstarted") return "À venir";
-  if (match.time_elapsed === "finished") return "Terminé";
+function getStatusLabel(match: FootballMatch, locale: "en" | "fr"): string {
+  if (match.finished === "TRUE" || match.finished === "true") return t(locale, "football.completed");
+  if (match.time_elapsed === "HT") return t(locale, "football.halftime");
+  if (match.time_elapsed === "notstarted") return t(locale, "football.upcoming.label");
+  if (match.time_elapsed === "finished") return t(locale, "football.completed");
   return `${match.time_elapsed}'`;
 }
 
@@ -18,21 +23,23 @@ function isLive(match: FootballMatch): boolean {
   );
 }
 
-function getRoundLabel(type: string, group: string): string {
+function getRoundLabel(type: string, group: string, locale: "en" | "fr"): string {
   switch (type) {
-    case "r32": return "⅛ de finale";
-    case "r16": return "¼ de finale";
-    case "qf": return "¼ de finale";
-    case "sf": return "½ finale";
-    case "third": return "3ème place";
-    case "final": return "Finale";
-    default: return `Groupe ${group}`;
+    case "r32": return t(locale, "football.roundof16");
+    case "r16": return t(locale, "football.quarterfinals");
+    case "qf": return t(locale, "football.quarterfinals");
+    case "sf": return t(locale, "football.semifinals");
+    case "third": return t(locale, "football.thirdplace");
+    case "final": return t(locale, "football.final");
+    default: return `${t(locale, "football.group")} ${group}`;
   }
 }
 
-export function MatchCard({ match }: { match: FootballMatch }) {
+export const MatchCard = React.memo(function MatchCard({ match }: { match: FootballMatch }) {
+  const locale = useTvStore((s) => s.locale);
   const live = isLive(match);
-  const status = getStatusLabel(match);
+  const status = getStatusLabel(match, locale);
+  const roundLabel = getRoundLabel(match.type, match.group, locale);
   const homeFlag = getTeamFlag(match.home_team_name_en);
   const awayFlag = getTeamFlag(match.away_team_name_en);
   const homeName = match.home_team_label || match.home_team_name_en || "TBD";
@@ -53,7 +60,7 @@ export function MatchCard({ match }: { match: FootballMatch }) {
       }`}
     >
       <div className="mb-2 flex items-center justify-between text-xs text-muted">
-        <span>{getRoundLabel(match.type, match.group)}</span>
+        <span>{roundLabel}</span>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
             live
@@ -105,4 +112,4 @@ export function MatchCard({ match }: { match: FootballMatch }) {
       ) : null}
     </div>
   );
-}
+});

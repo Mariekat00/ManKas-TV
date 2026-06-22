@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -94,7 +95,8 @@ class MatchNotificationService {
       final minute = timeParts.length > 1 ? int.parse(timeParts[1]) : 0;
 
       return DateTime(year, month, day, hour, minute);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('MatchNotificationService._parseMatchDateTime failed: $e');
       return null;
     }
   }

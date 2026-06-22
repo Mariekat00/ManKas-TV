@@ -5,6 +5,8 @@ import { FileUp, Plus, Trash2 } from "lucide-react";
 import { parseM3U } from "@/lib/m3u";
 import { createChannel, deleteChannel, importIptvPlaylist } from "@/services/channels";
 import { useChannels } from "@/hooks/useChannels";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 import type { ChannelInsert, M3UChannel } from "@/types";
 
 const emptyChannel: ChannelInsert = {
@@ -23,6 +25,7 @@ export function AdminPanel() {
   const [status, setStatus] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const parsedChannels = useMemo(() => parseM3U(m3uText), [m3uText]);
+  const locale = useTvStore((s) => s.locale);
 
   async function submitChannel(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,11 +75,10 @@ export function AdminPanel() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
       <header>
-        <p className="text-sm font-medium uppercase tracking-[0.22em] text-accent">Admin mode</p>
-        <h1 className="mt-3 text-3xl font-semibold">Channel management</h1>
+        <p className="text-sm font-medium uppercase tracking-[0.22em] text-accent">{t(locale, "admin.title")}</p>
+        <h1 className="mt-3 text-3xl font-semibold">{t(locale, "admin.description")}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Add only legal public IPTV streams. Admin writes require `SUPABASE_SERVICE_ROLE_KEY` on
-          the server.
+          {t(locale, "admin.desc.long")}
         </p>
       </header>
 
@@ -88,29 +90,29 @@ export function AdminPanel() {
         <form onSubmit={submitChannel} className="rounded-md border border-border bg-panel p-4">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <Plus size={18} className="text-accent" aria-hidden="true" />
-            Add channel
+            {t(locale, "admin.add.channel")}
           </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <TextField label="Name" value={form.name} required onChange={(name) => setForm({ ...form, name })} />
+            <TextField label={t(locale, "admin.name")} value={form.name} required onChange={(name) => setForm({ ...form, name })} />
             <TextField
-              label="Stream URL"
+              label={t(locale, "admin.stream.url")}
               value={form.stream_url}
               required
               onChange={(stream_url) => setForm({ ...form, stream_url })}
             />
-            <TextField label="Logo URL" value={form.logo ?? ""} onChange={(logo) => setForm({ ...form, logo })} />
+            <TextField label={t(locale, "admin.logo.url")} value={form.logo ?? ""} onChange={(logo) => setForm({ ...form, logo })} />
             <TextField
-              label="Category"
+              label={t(locale, "admin.category")}
               value={form.category ?? ""}
               onChange={(category) => setForm({ ...form, category })}
             />
             <TextField
-              label="Country"
+              label={t(locale, "admin.country")}
               value={form.country ?? ""}
               onChange={(country) => setForm({ ...form, country })}
             />
             <TextField
-              label="Language"
+              label={t(locale, "admin.language")}
               value={form.language ?? ""}
               onChange={(language) => setForm({ ...form, language })}
             />
@@ -120,14 +122,14 @@ export function AdminPanel() {
             className="mt-4 flex h-10 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Plus size={16} aria-hidden="true" />
-            Add channel
+            {t(locale, "admin.add.channel")}
           </button>
         </form>
 
         <section className="rounded-md border border-border bg-panel p-4">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
             <FileUp size={18} className="text-accent" aria-hidden="true" />
-            Import M3U
+            {t(locale, "admin.import.m3u")}
           </h2>
           <textarea
             value={m3uText}
@@ -136,7 +138,7 @@ export function AdminPanel() {
             className="mt-4 min-h-48 w-full rounded-md border border-border bg-background p-3 font-mono text-sm outline-none transition focus:border-accent"
           />
           <div className="mt-3 flex flex-col gap-3 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-            <span>{parsedChannels.length} parsed</span>
+            <span>{parsedChannels.length} {t(locale, "admin.parsed")}</span>
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -145,7 +147,7 @@ export function AdminPanel() {
                 className="flex h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <FileUp size={16} aria-hidden="true" />
-                Import
+                {t(locale, "admin.import")}
               </button>
               <button
                 type="button"
@@ -165,7 +167,7 @@ export function AdminPanel() {
                 className="flex h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-foreground disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <FileUp size={16} aria-hidden="true" />
-                Import IPTV playlist
+                {t(locale, "admin.import.playlist")}
               </button>
             </div>
           </div>
@@ -174,11 +176,11 @@ export function AdminPanel() {
 
       <section className="rounded-md border border-border bg-panel">
         <div className="border-b border-border p-4">
-          <h2 className="text-lg font-semibold">Existing channels</h2>
-          <p className="mt-1 text-sm text-muted">Delete test or expired streams from Supabase.</p>
+          <h2 className="text-lg font-semibold">{t(locale, "admin.existing")}</h2>
+          <p className="mt-1 text-sm text-muted">{t(locale, "admin.existing.desc")}</p>
         </div>
         {error ? <div className="p-4 text-sm text-muted">{error}</div> : null}
-        {isLoading ? <div className="p-4 text-sm text-muted">Loading channels...</div> : null}
+        {isLoading ? <div className="p-4 text-sm text-muted">{t(locale, "admin.loading")}</div> : null}
         <div className="divide-y divide-border">
           {channels.map((channel) => (
             <div key={channel.id} className="flex items-center justify-between gap-3 p-4">

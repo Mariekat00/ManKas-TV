@@ -33,7 +33,7 @@ async function fetchTokens(streamKey: string, category: string): Promise<Tokens 
     if (!res.ok) return null;
     const html = await res.text();
 
-    const match = html.match(/const _0x = (\{.*?\});/s);
+    const match = html.match(/const _0x = (\{[\s\S]*?\});/);
     if (!match) return null;
     return JSON.parse(match[1]) as Tokens;
   } catch {
@@ -122,6 +122,7 @@ export async function GET() {
 
     return NextResponse.json({ channels });
   } catch {
+    console.error("StreamFree API fetch failed");
     return NextResponse.json({ channels: [] });
   }
 }

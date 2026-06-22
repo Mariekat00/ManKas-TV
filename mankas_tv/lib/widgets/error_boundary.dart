@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_strings.dart';
 
 class ErrorBoundary extends StatelessWidget {
   final String? error;
@@ -33,7 +34,7 @@ class ErrorBoundary extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Réessayer'),
+                  label: Text(AppStrings.of(context).retry),
                 ),
               ],
             ],

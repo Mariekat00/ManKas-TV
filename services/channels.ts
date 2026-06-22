@@ -25,7 +25,10 @@ export async function getChannels() {
   }
 
   try {
-    const response = await fetch("/data/channels.json");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const response = await fetch("/data/channels.json", { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (response.ok) {
       const data = await response.json();
       if (data.channels && data.channels.length > 0) {
@@ -36,8 +39,8 @@ export async function getChannels() {
         return channelCache.data;
       }
     }
-  } catch {
-    // fallback below
+  } catch (e) {
+    console.warn("getChannels fetch /data/channels.json failed:", e);
   }
 
   if (!isSupabaseConfigured()) {
@@ -89,7 +92,8 @@ export async function getChannel(id: string) {
     }
 
     return data;
-  } catch {
+  } catch (e) {
+    console.warn("getChannel supabase query failed:", e);
     const channels = await getChannels();
     const channel = channels.find((ch) => ch.id === id);
     if (!channel) throw new Error("Channel not found.");
@@ -114,7 +118,8 @@ export async function getCategories() {
     }
 
     return (data ?? []) as Category[];
-  } catch {
+  } catch (e) {
+    console.warn("getCategories supabase query failed:", e);
     return mockCategories;
   }
 }
@@ -194,7 +199,8 @@ export async function getFavorites() {
     }
 
     return (data ?? []).map((favorite) => favorite.channel_id);
-  } catch {
+  } catch (e) {
+    console.warn("getFavorites supabase query failed:", e);
     return [...mockFavorites];
   }
 }
@@ -266,7 +272,8 @@ export async function getWatchHistory() {
     }
 
     return (data ?? []) as WatchHistory[];
-  } catch {
+  } catch (e) {
+    console.warn("getWatchHistory supabase query failed:", e);
     return [] as WatchHistory[];
   }
 }

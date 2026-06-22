@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { FootballGroup, FootballTeam } from "@/types";
 import { getTeamFlag } from "@/lib/flags";
+import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 
 type Props = {
   groups: FootballGroup[];
@@ -15,6 +17,7 @@ function getTeamName(teamId: string, teams: Record<string, FootballTeam>): strin
 
 export function GroupStandings({ groups, teams }: Props) {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const locale = useTvStore((s) => s.locale);
 
   const filteredGroups = selectedGroup
     ? groups.filter((g) => g.name === selectedGroup)
@@ -34,7 +37,7 @@ export function GroupStandings({ groups, teams }: Props) {
               : "border border-border bg-panel text-muted hover:bg-panel-strong"
           }`}
         >
-          Tous
+          {t(locale, "football.all")}
         </button>
         {sorted.map((g) => (
           <button
@@ -63,9 +66,9 @@ export function GroupStandings({ groups, teams }: Props) {
               className="overflow-hidden rounded-lg border border-border bg-panel"
             >
               <div className="flex items-center justify-between border-b border-border bg-panel-strong px-4 py-2.5">
-                <span className="text-sm font-bold">Groupe {group.name}</span>
+                <span className="text-sm font-bold">{t(locale, "football.group")} {group.name}</span>
                 <span className="text-xs text-muted">
-                  {teamRows.length} équipes
+                  {teamRows.length} {t(locale, "football.teams")}
                 </span>
               </div>
 
@@ -74,13 +77,14 @@ export function GroupStandings({ groups, teams }: Props) {
                   <thead>
                     <tr className="border-b border-border text-xs text-muted">
                       <th className="px-3 py-2 text-left font-medium">#</th>
-                      <th className="px-3 py-2 text-left font-medium">Équipe</th>
-                      <th className="px-2 py-2 text-center font-medium">MJ</th>
-                      <th className="px-2 py-2 text-center font-medium">N</th>
-                      <th className="px-2 py-2 text-center font-medium">P</th>
-                      <th className="px-2 py-2 text-center font-medium">BP</th>
-                      <th className="px-2 py-2 text-center font-medium">BC</th>
-                      <th className="px-3 py-2 text-center font-medium">Pts</th>
+                      <th className="px-3 py-2 text-left font-medium">{t(locale, "football.team")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.mp")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.w")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.d")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.l")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.gf")}</th>
+                      <th className="px-2 py-2 text-center font-medium">{t(locale, "football.ga")}</th>
+                      <th className="px-3 py-2 text-center font-medium">{t(locale, "football.pts")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -96,24 +100,12 @@ export function GroupStandings({ groups, teams }: Props) {
                           <span className="mr-1.5">{getTeamFlag(getTeamName(team.team_id, teams))}</span>
                           {getTeamName(team.team_id, teams)}
                         </td>
-                        <td className="px-2 py-2.5 text-center tabular-nums">
-                          {team.played}
-                        </td>
-                        <td className="px-2 py-2.5 text-center tabular-nums">
-                          {team.win}
-                        </td>
-                        <td className="px-2 py-2.5 text-center tabular-nums">
-                          {team.draw}
-                        </td>
-                        <td className="px-2 py-2.5 text-center tabular-nums">
-                          {team.goals_for}
-                        </td>
-                        <td className="px-2 py-2.5 text-center tabular-nums">
-                          {team.goals_against}
-                        </td>
-                        <td className="px-3 py-2.5 text-center font-bold tabular-nums">
-                          {team.points}
-                        </td>
+                        <td className="px-2 py-2.5 text-center tabular-nums">{team.played}</td>
+                        <td className="px-2 py-2.5 text-center tabular-nums">{team.win}</td>
+                        <td className="px-2 py-2.5 text-center tabular-nums">{team.draw}</td>
+                        <td className="px-2 py-2.5 text-center tabular-nums">{team.goals_for}</td>
+                        <td className="px-2 py-2.5 text-center tabular-nums">{team.goals_against}</td>
+                        <td className="px-3 py-2.5 text-center font-bold tabular-nums">{team.points}</td>
                       </tr>
                     ))}
                   </tbody>

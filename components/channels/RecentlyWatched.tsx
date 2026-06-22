@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { Clock3 } from "lucide-react";
 import { getWatchHistory } from "@/services/channels";
 import { useTvStore } from "@/store/useTvStore";
+import { t } from "@/lib/translations";
 import type { WatchHistory } from "@/types";
 
 export function RecentlyWatched() {
   const router = useRouter();
   const [items, setItems] = useState<WatchHistory[]>([]);
   const setSelectedChannel = useTvStore((state) => state.setSelectedChannel);
+  const locale = useTvStore((state) => state.locale);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,7 +38,7 @@ export function RecentlyWatched() {
     <section id="recent" className="space-y-3">
       <div className="flex items-center gap-2">
         <Clock3 size={18} className="text-accent" aria-hidden="true" />
-        <h2 className="text-lg font-semibold">Recently watched</h2>
+        <h2 className="text-lg font-semibold">{t(locale, "home.recent")}</h2>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2">
         {items.map((item) =>
