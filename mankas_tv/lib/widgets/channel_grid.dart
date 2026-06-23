@@ -56,10 +56,9 @@ class _ChannelGridState extends State<ChannelGrid> {
 
   @override
   Widget build(BuildContext context) {
-    final channels = widget.channelsOverride ??
-        context.select<TvProvider, List<Channel>>((p) => p.filteredChannels);
-    final isLoading = context.select<TvProvider, bool>((p) => p.isLoading);
-    final provider = context.read<TvProvider>();
+    final provider = context.watch<TvProvider>();
+    final channels = widget.channelsOverride ?? provider.filteredChannels;
+    final isLoading = provider.isLoading;
 
     if (isLoading) {
       return Center(

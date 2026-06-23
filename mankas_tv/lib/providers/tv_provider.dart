@@ -43,9 +43,24 @@ class TvProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _channels = await _service.getChannels();
-    _favorites = await _service.getFavorites();
-    _recentSearches = await _service.getRecentSearches();
+    try {
+      _channels = await _service.getChannels();
+    } catch (e) {
+      debugPrint('loadChannels: API failed, using guaranteed: $e');
+    }
+
+    try {
+      _favorites = await _service.getFavorites();
+    } catch (_) {
+      _favorites = [];
+    }
+
+    try {
+      _recentSearches = await _service.getRecentSearches();
+    } catch (_) {
+      _recentSearches = [];
+    }
+
     _applyFilters();
 
     if (_channels.isNotEmpty && _selectedChannel == null) {

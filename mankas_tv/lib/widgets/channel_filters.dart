@@ -13,6 +13,9 @@ class ChannelFilters extends StatelessWidget {
         final categories = ['Tout', ...provider.categories.toList()..sort()];
         final countries = ['Tout', ...provider.countries.toList()..sort()];
 
+        final safeCategory = categories.contains(provider.category) ? provider.category : 'Tout';
+        final safeCountry = countries.contains(provider.country) ? provider.country : 'Tout';
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Column(
@@ -58,9 +61,9 @@ class ChannelFilters extends StatelessWidget {
                         color: const Color(0xFF2A2A3E),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          value: provider.category,
+                          value: safeCategory,
                           isDense: true,
                           isExpanded: true,
                           dropdownColor: const Color(0xFF2A2A3E),
@@ -79,9 +82,9 @@ class ChannelFilters extends StatelessWidget {
                         color: const Color(0xFF2A2A3E),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: DropdownButtonHideUnderline(
+                        child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
-                          value: provider.country,
+                          value: safeCountry,
                           isDense: true,
                           isExpanded: true,
                           dropdownColor: const Color(0xFF2A2A3E),
