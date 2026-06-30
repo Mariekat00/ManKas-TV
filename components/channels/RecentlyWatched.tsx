@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock3 } from "lucide-react";
+import { ClockIcon } from "@/components/icons/clock";
 import { getWatchHistory } from "@/services/channels";
 import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
@@ -31,13 +31,24 @@ export function RecentlyWatched() {
   }, []);
 
   if (items.length === 0) {
-    return null;
+    return (
+      <section id="recent" className="space-y-3">
+        <div className="flex items-center gap-2">
+          <ClockIcon size={18} className="text-accent" aria-hidden="true" />
+          <h2 className="text-lg font-semibold">{t(locale, "home.recent")}</h2>
+        </div>
+        <div className="flex flex-col items-center gap-3 rounded-md border border-border bg-panel p-8 text-center text-sm text-muted">
+          <ClockIcon className="size-10 text-muted/40" />
+          <p className="max-w-xs">{t(locale, "grid.no.recent")}</p>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section id="recent" className="space-y-3">
       <div className="flex items-center gap-2">
-        <Clock3 size={18} className="text-accent" aria-hidden="true" />
+        <ClockIcon size={18} className="text-accent" aria-hidden="true" />
         <h2 className="text-lg font-semibold">{t(locale, "home.recent")}</h2>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-2">

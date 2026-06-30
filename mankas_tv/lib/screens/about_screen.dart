@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../utils/app_strings.dart';
+import 'privacy_screen.dart';
 
 const _appVersion = '1.0.0';
 const _developerName = 'Moïse Manda';
@@ -21,10 +22,16 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final surface = theme.colorScheme.surface;
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+    final border = theme.colorScheme.surface.withAlpha(178);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF11111B),
+      backgroundColor: scaffoldBg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: surface,
         title: Text(AppStrings.of(context).about, style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: SingleChildScrollView(
@@ -32,18 +39,20 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Center(
               child: Column(
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
+                  Semantics(
+                    label: AppStrings.of(context).about,
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: primary.withAlpha(38),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(Icons.info_outline, color: primary, size: 36),
                     ),
-                    child: const Icon(Icons.info_outline, color: Color(0xFF6366F1), size: 36),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -55,9 +64,10 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Présentation
-            _sectionTitle('Overview'),
+            _sectionTitle(AppStrings.of(context).overview),
             _card(
+              surface: surface,
+              border: border,
               child: const Text(
                 'ManKas TV is designed to offer a simple, fast, and efficient streaming experience. It lets users watch their favorite IPTV channels, discover live matches, and enjoy a modern interface optimized for mobile devices.',
                 style: TextStyle(color: Colors.white70, height: 1.6),
@@ -65,17 +75,16 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Fonctionnalités
-            _sectionTitle('Features'),
+            _sectionTitle(AppStrings.of(context).features),
             _card(
+              surface: surface,
+              border: border,
               child: Column(
                 children: [
                   _feature('📺', '4500+ public IPTV channels'),
-                  _feature('⚽', 'Live matches via StreamFree'),
                   _feature('🏆', 'FIFA World Cup 2026 tracking'),
-                  _feature('❤️', 'Favorites system'),
-                  _feature('🔍', 'Search by name, country, language'),
-                  _feature('🎨', 'Dark / Light theme'),
+                  _feature('❤️', AppStrings.of(context).favorites),
+                  _feature('🔍', AppStrings.of(context).searchHint),
                   _feature('📱', 'Flutter mobile app'),
                   _feature('🌐', 'Next.js web version'),
                 ],
@@ -83,31 +92,29 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Développeur
-            _sectionTitle('Developer'),
+            _sectionTitle(AppStrings.of(context).developer),
             _card(
+              surface: surface,
+              border: border,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(_developerName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text(_developerCompany, style: const TextStyle(color: Color(0xFF6366F1), fontSize: 13)),
+                  Text(_developerCompany, style: TextStyle(color: primary, fontSize: 13)),
                   const SizedBox(height: 12),
-                  Text(
-                    _developerBio,
-                    style: const TextStyle(color: Colors.white70, height: 1.5),
-                  ),
+                  Text(_developerBio, style: const TextStyle(color: Colors.white70, height: 1.5)),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
-                  _skillTag('Flutter Development'),
-                  _skillTag('Web Development'),
-                  _skillTag('Graphic Design'),
-                  _skillTag('Artificial Intelligence'),
-                  _skillTag('IT Training'),
-                  _skillTag('Digital Solutions'),
+                      _skillTag('Flutter Development', primary, surface, border),
+                      _skillTag('Web Development', primary, surface, border),
+                      _skillTag('Graphic Design', primary, surface, border),
+                      _skillTag('Artificial Intelligence', primary, surface, border),
+                      _skillTag('IT Training', primary, surface, border),
+                      _skillTag('Digital Solutions', primary, surface, border),
                     ],
                   ),
                 ],
@@ -115,61 +122,61 @@ class AboutScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // ManKas Corporation
-            _sectionTitle('About ManKas Corporation'),
+            _sectionTitle(AppStrings.of(context).about),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.08),
+                color: primary.withAlpha(20),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.3)),
+                border: Border.all(color: primary.withAlpha(77)),
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     '"Creative, fast, and effective innovation"',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       fontStyle: FontStyle.italic,
-                      color: Color(0xFF6366F1),
+                      color: primary,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  _serviceItem(Icons.phone_android, 'Mobile app development'),
-                  _serviceItem(Icons.language, 'Website creation'),
-                  _serviceItem(Icons.qr_code, 'QR Code solutions'),
-                  _serviceItem(Icons.palette, 'Graphic design'),
-                  _serviceItem(Icons.school, 'IT training'),
-                  _serviceItem(Icons.lightbulb_outline, 'Digital consulting'),
+                  _serviceItem(Icons.phone_android, 'Mobile app development', primary),
+                  _serviceItem(Icons.language, 'Website creation', primary),
+                  _serviceItem(Icons.qr_code, 'QR Code solutions', primary),
+                  _serviceItem(Icons.palette, 'Graphic design', primary),
+                  _serviceItem(Icons.school, 'IT training', primary),
+                  _serviceItem(Icons.lightbulb_outline, 'Digital consulting', primary),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
-            // Contact
-            _sectionTitle('Contact'), // keep English
-            _contactTile(Icons.phone, 'Phone', _phone, () => _launchUrl(_phoneUri)),
+            _sectionTitle(AppStrings.of(context).contact),
+            _contactTile(Icons.phone, 'Phone', _phone, () => _launchUrl(_phoneUri), primary, surface, border),
             const SizedBox(height: 8),
-            _contactTile(Icons.email, 'Email', _email, () => _launchUrl(_emailUri)),
+            _contactTile(Icons.email, 'Email', _email, () => _launchUrl(_emailUri), primary, surface, border),
+            const SizedBox(height: 8),
+            _contactTile(Icons.shield, AppStrings.of(context).privacyPolicy, '', () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyScreen()));
+            }, primary, surface, border),
             const SizedBox(height: 24),
 
-            // Réseaux sociaux
-            _sectionTitle('Social Networks'),
-            _socialTile('WhatsApp', _whatsappUrl, Colors.green),
+            _sectionTitle(AppStrings.of(context).socialNetworks),
+            _socialTile('WhatsApp', _whatsappUrl, Colors.green, surface, border),
             const SizedBox(height: 8),
-            _socialTile('Telegram', _telegramUrl, Colors.blue),
+            _socialTile('Telegram', _telegramUrl, Colors.blue, surface, border),
             const SizedBox(height: 8),
-            _socialTile('LinkedIn', _linkedinUrl, Colors.blue.shade700),
+            _socialTile('LinkedIn', _linkedinUrl, Colors.blue.shade700, surface, border),
             const SizedBox(height: 8),
-            _socialTile('Instagram', _instagramUrl, Colors.pink),
+            _socialTile('Instagram', _instagramUrl, Colors.pink, surface, border),
             const SizedBox(height: 8),
-            _socialTile('GitHub', _githubUrl, Colors.white),
+            _socialTile('GitHub', _githubUrl, Colors.white, surface, border),
             const SizedBox(height: 32),
 
-            // Footer
             Center(
               child: Column(
                 children: [
@@ -199,14 +206,14 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  static Widget _card({required Widget child}) {
+  static Widget _card({required Widget child, required Color surface, required Color border}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E),
+        color: surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2A2A3E)),
+        border: Border.all(color: border),
       ),
       child: child,
     );
@@ -225,24 +232,24 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  static Widget _skillTag(String text) {
+  static Widget _skillTag(String text, Color primary, Color surface, Color border) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E),
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2A2A3E)),
+        border: Border.all(color: border),
       ),
       child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12)),
     );
   }
 
-  static Widget _serviceItem(IconData icon, String text) {
+  static Widget _serviceItem(IconData icon, String text, Color primary) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF6366F1), size: 20),
+          Icon(icon, color: primary, size: 20),
           const SizedBox(width: 12),
           Expanded(child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 14))),
         ],
@@ -250,54 +257,62 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  static Widget _contactTile(IconData icon, String label, String value, VoidCallback onTap) {
+  static Widget _contactTile(IconData icon, String label, String value, VoidCallback onTap, Color primary, Color surface, Color border) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF2A2A3E)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFF6366F1), size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                  const SizedBox(height: 2),
-                  Text(value, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                ],
+      child: Semantics(
+        label: '$label $value',
+        button: true,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: primary, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    const SizedBox(height: 2),
+                    Text(value, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  static Widget _socialTile(String label, String url, Color color) {
+  static Widget _socialTile(String label, String url, Color color, Color surface, Color border) {
     return GestureDetector(
       onTap: () => _launchUrl(url),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF2A2A3E)),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.link, color: color, size: 20),
-            const SizedBox(width: 12),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-            const Spacer(),
-            const Icon(Icons.open_in_new, color: Colors.white38, size: 16),
-          ],
+      child: Semantics(
+        label: label,
+        button: true,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: border),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.link, color: color, size: 20),
+              const SizedBox(width: 12),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+              const Spacer(),
+              const Icon(Icons.open_in_new, color: Colors.white38, size: 16),
+            ],
+          ),
         ),
       ),
     );

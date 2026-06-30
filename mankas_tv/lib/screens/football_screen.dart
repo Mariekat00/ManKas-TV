@@ -4,6 +4,8 @@ import '../services/football_service.dart';
 import '../widgets/football/match_card.dart';
 import '../widgets/football/group_standings.dart';
 import '../widgets/football/match_schedule.dart';
+import '../utils/app_strings.dart';
+import '../core/widgets/app_state_page.dart';
 
 class FootballScreen extends StatefulWidget {
   const FootballScreen({super.key});
@@ -43,16 +45,17 @@ class _FootballScreenState extends State<FootballScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF12121E),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            Text('⚽ ', style: TextStyle(fontSize: 20)),
-            Text('FIFA World Cup 2026'),
+            const Text('⚽ ', style: TextStyle(fontSize: 20)),
+            Text(AppStrings.of(context).worldCup),
           ],
         ),
-        backgroundColor: const Color(0xFF1A1A2E),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Container(
@@ -60,23 +63,28 @@ class _FootballScreenState extends State<FootballScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                _tabButton('Matchs du jour', 0),
+                _tabButton(AppStrings.of(context).todayMatches, 0, theme),
                 const SizedBox(width: 8),
-                _tabButton('Classements', 1),
+                _tabButton(AppStrings.of(context).standings, 1, theme),
                 const SizedBox(width: 8),
-                _tabButton('Calendrier', 2),
+                _tabButton(AppStrings.of(context).schedule, 2, theme),
               ],
             ),
           ),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF6366F1)))
-          : _buildContent(),
+          ? AppStatePage(
+              icon: Icons.refresh_rounded,
+              iconColor: theme.colorScheme.primary,
+              title: AppStrings.of(context).loading,
+              description: '${AppStrings.of(context).football}...',
+            )
+          : _buildContent(theme),
     );
   }
 
-  Widget _tabButton(String label, int index) {
+  Widget _tabButton(String label, int index, ThemeData theme) {
     final isSelected = _selectedTab == index;
     return Expanded(
       child: GestureDetector(
@@ -84,21 +92,20 @@ class _FootballScreenState extends State<FootballScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF6366F1) : const Color(0xFF1E1E2E),
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected
-                  ? const Color(0xFF6366F1)
-                  : const Color(0xFF2A2A3E),
+              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
             ),
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : Colors.white54,
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),
@@ -106,97 +113,71 @@ class _FootballScreenState extends State<FootballScreen> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(ThemeData theme) {
     switch (_selectedTab) {
       case 0:
-        return _buildTodayTab();
+        return _buildMatchesTab(theme);
       case 1:
-        return GroupStandings(groups: _groups, teamNames: _teamNames);
+        return _buildStandingsTab(theme);
       case 2:
-        return MatchSchedule(matches: _matches);
+        return _buildScheduleTab(theme);
       default:
         return const SizedBox.shrink();
     }
   }
 
-  Widget _buildTodayTab() {
-    final live = _matches.where((m) => m.isLive).toList();
+  Widget _buildMatchesTab(ThemeData theme) {
     final now = DateTime.now();
-    final todayStr =
-        '${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}';
-    final today = _matches.where((m) => m.datePart == todayStr).toList();
-    final upcoming = _matches
-        .where((m) => !m.hasStarted)
-        .toList()
-      ..sort((a, b) => a.localDate.compareTo(b.localDate));
-    final next8 = upcoming.take(8).toList();
+    final today = _matches.where((m) {
+      try {
+        final dateStr = m.datePart;
+        final parts = dateStr.split('-');
+        if (parts.length < 3) return false;
+        final year = int.tryParse(parts[0]);
+        final month = int.tryParse(parts[1]);
+        final day = int.tryParse(parts[2]);
+        return year == now.year && month == now.month && day == now.day;
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+
+    if (today.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _loadData,
+        child: AppStatePage(
+          icon: Icons.sports_soccer_rounded,
+          iconColor: theme.colorScheme.primary,
+          title: AppStrings.of(context).noMatchesToday,
+          description: AppStrings.of(context).upcomingMatches,
+        ),
+      );
+    }
 
     return RefreshIndicator(
-      color: const Color(0xFF6366F1),
-      backgroundColor: const Color(0xFF1A1A2E),
       onRefresh: _loadData,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (live.isNotEmpty) ...[
-            _sectionHeader('🔴 En direct', live.length),
-            ...live.map((m) => MatchCard(match: m)),
-            const SizedBox(height: 16),
-          ],
-          if (today.isNotEmpty) ...[
-            _sectionHeader('Aujourd\'hui', today.length),
-            ...today.map((m) => MatchCard(match: m)),
-            const SizedBox(height: 16),
-          ],
-          if (live.isEmpty && today.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 32),
-              child: Text(
-                'Aucun match en cours aujourd\'hui',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white.withAlpha(102),
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          _sectionHeader('Prochains matchs', next8.length),
-          ...next8.map((m) => MatchCard(match: m)),
-        ],
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: today.length,
+        itemBuilder: (context, index) => MatchCard(match: today[index]),
       ),
     );
   }
 
-  Widget _sectionHeader(String title, int count) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6366F1).withAlpha(38),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '$count',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF6366F1),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  Widget _buildStandingsTab(ThemeData theme) {
+    if (_groups.isEmpty) {
+      return AppStatePage(
+        icon: Icons.leaderboard_rounded,
+        iconColor: theme.colorScheme.primary,
+        title: AppStrings.of(context).standings,
+        description: AppStrings.of(context).loading,
+      );
+    }
+
+    return GroupStandings(groups: _groups, teamNames: _teamNames);
+  }
+
+  Widget _buildScheduleTab(ThemeData theme) {
+    return MatchSchedule(matches: _matches);
   }
 }

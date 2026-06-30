@@ -7,6 +7,7 @@ import '../services/football_service.dart';
 import '../utils/category_theme.dart';
 import '../utils/app_strings.dart';
 import '../services/match_notification_service.dart';
+import '../widgets/animated_icons.dart';
 import 'about_screen.dart';
 import 'admin_screen.dart';
 import 'football_screen.dart';
@@ -56,31 +57,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            _buildHeader(),
+            _buildHeader(theme),
             const SizedBox(height: 16),
-            _buildMainButtons(),
+            _buildMainButtons(theme),
             const SizedBox(height: 10),
-            _buildQuickAccess(),
+            _buildM6LiveBanner(theme),
+            const SizedBox(height: 10),
+            _buildQuickAccess(theme),
             const SizedBox(height: 24),
-            _buildSectionTitle('⚽ Today\'s Matches', null),
+            _buildSectionTitle('⚽ ${AppStrings.of(context).todaysMatches}', null, theme),
             const SizedBox(height: 12),
-            _buildMatchesSection(),
+            _buildMatchesSection(theme),
             const SizedBox(height: 28),
-            _buildSectionTitle('🔥 Popular Channels', null),
+            _buildSectionTitle('🔥 ${AppStrings.of(context).popularChannels}', null, theme),
             const SizedBox(height: 12),
-            _buildPopularChannels(),
+            _buildPopularChannels(theme),
             const SizedBox(height: 28),
-            _buildSectionTitle('📂 ${AppStrings.of(context).categories}', null),
+            _buildSectionTitle('📂 ${AppStrings.of(context).categories}', null, theme),
             const SizedBox(height: 12),
-            _buildCategories(),
+            _buildCategories(theme),
             const SizedBox(height: 28),
-            _buildBanner(),
+            _buildBanner(theme),
             const SizedBox(height: 32),
           ],
         ),
@@ -89,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── HEADER ─────────
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Row(
@@ -98,8 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+              gradient: LinearGradient(
+                colors: [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(180)],
               ),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -115,37 +119,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2,
-                  color: const Color(0xFF6366F1).withAlpha(200),
+                  color: theme.colorScheme.primary.withAlpha(200),
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
+              Text(
                 'ManKas TV',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.5,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
           ),
           const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.info_outline, size: 22, color: Colors.white60),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AboutScreen()),
+          Semantics(
+            label: AppStrings.of(context).about,
+            child: IconButton(
+              icon: Icon(Icons.info_outline, size: 22, color: theme.colorScheme.onSurfaceVariant),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutScreen()),
+              ),
+              tooltip: AppStrings.of(context).about,
             ),
-            tooltip: AppStrings.of(context).about,
           ),
-          IconButton(
-            icon: const Icon(Icons.admin_panel_settings, size: 22, color: Colors.white60),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminScreen()),
+          Semantics(
+            label: AppStrings.of(context).adminPanel,
+            child: IconButton(
+              icon: Icon(Icons.admin_panel_settings, size: 22, color: theme.colorScheme.onSurfaceVariant),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminScreen()),
+              ),
+              tooltip: AppStrings.of(context).adminPanel,
             ),
-            tooltip: 'Admin',
           ),
         ],
       ),
@@ -153,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── MAIN BUTTONS ─────────
-  Widget _buildMainButtons() {
+  Widget _buildMainButtons(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -162,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _GradientButton(
               icon: Icons.tv,
               label: AppStrings.of(context).liveTV,
-              gradient: const [Color(0xFF6366F1), Color(0xFF4F46E5)],
+              gradient: [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(200)],
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const IptvScreen()),
@@ -173,8 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: _GradientButton(
               icon: Icons.sports_soccer,
-              label: 'Live Matches',
-              gradient: const [Color(0xFFEF4444), Color(0xFFDC2626)],
+              label: AppStrings.of(context).liveMatches,
+              gradient: [theme.colorScheme.error, theme.colorScheme.error.withAlpha(200)],
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const LiveMatchesScreen()),
@@ -186,15 +196,143 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ───────── M6 LIVE BANNER ─────────
+  Widget _buildM6LiveBanner(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GestureDetector(
+        onTap: () {
+          final provider = context.read<TvProvider>();
+          final m6 = provider.channels.where(
+            (c) => c.name.toLowerCase().contains('m6'),
+          );
+          if (m6.isNotEmpty) {
+            provider.setSelectedChannel(m6.first);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PlayerScreen()),
+            );
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF1A1A2E),
+                const Color(0xFF16213E),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.red.withAlpha(80)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.red.withAlpha(20),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Text(
+                    'M6',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'EN DIRECT',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'M6 — TV en direct',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      AppStrings.of(context).liveTV,
+                      style: TextStyle(
+                        color: Colors.white.withAlpha(150),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.play_arrow, color: Colors.white, size: 18),
+                    SizedBox(width: 4),
+                    Text(
+                      'Regarder',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   // ───────── QUICK ACCESS ─────────
-  Widget _buildQuickAccess() {
+  Widget _buildQuickAccess(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           _PillButton(
             icon: Icons.emoji_events,
-            label: 'World Cup',
+            label: AppStrings.of(context).worldCup,
             color: const Color(0xFFF59E0B),
             onTap: () => Navigator.push(
               context,
@@ -214,12 +352,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: active ? const Color(0xFFEC4899).withAlpha(30) : const Color(0xFF1E1E2E),
+                    color: active ? const Color(0xFFEC4899).withAlpha(30) : theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: active ? const Color(0xFFEC4899) : const Color(0xFF2A2A3E),
+                      color: active ? const Color(0xFFEC4899) : theme.colorScheme.surfaceContainerHighest,
                     ),
                   ),
                   child: Row(
@@ -227,14 +365,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Icon(
                         active ? Icons.favorite : Icons.favorite_border,
-                        color: active ? const Color(0xFFEC4899) : Colors.white70,
+                        color: active ? const Color(0xFFEC4899) : theme.colorScheme.onSurfaceVariant,
                         size: 16,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         '${AppStrings.of(context).favorites} (${provider.favorites.length})',
                         style: TextStyle(
-                          color: active ? const Color(0xFFEC4899) : Colors.white70,
+                          color: active ? const Color(0xFFEC4899) : theme.colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       ),
@@ -250,27 +388,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── SECTION TITLE ─────────
-  Widget _buildSectionTitle(String title, String? action) {
+  Widget _buildSectionTitle(String title, String? action, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const Spacer(),
           if (action != null)
             Text(
               action,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF6366F1),
+                color: theme.colorScheme.primary,
               ),
             ),
         ],
@@ -279,12 +417,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── MATCHS DU JOUR ─────────
-  Widget _buildMatchesSection() {
+  Widget _buildMatchesSection(ThemeData theme) {
     if (_matchesLoading) {
-      return const SizedBox(
+      return SizedBox(
         height: 120,
         child: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6366F1), strokeWidth: 2),
+          child: SpinningIcon(icon: Icons.refresh, size: 32, color: theme.colorScheme.primary),
         ),
       );
     }
@@ -296,11 +434,11 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.sports_soccer, size: 36, color: Colors.white.withAlpha(40)),
+              PulsingIcon(icon: Icons.sports_soccer, size: 36, color: theme.colorScheme.onSurfaceVariant),
               const SizedBox(height: 8),
               Text(
-                'No upcoming matches',
-                style: TextStyle(color: Colors.white.withAlpha(100), fontSize: 13),
+                AppStrings.of(context).noMatchesToday,
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13),
               ),
             ],
           ),
@@ -314,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _upcomingMatches.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _i) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final match = _upcomingMatches[index];
           return _MatchCard(match: match);
@@ -324,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── CHAÎNES POPULAIRES ─────────
-  Widget _buildPopularChannels() {
+  Widget _buildPopularChannels(ThemeData theme) {
     final popular = _getPopularChannels();
     return SizedBox(
       height: 110,
@@ -332,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: popular.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _i) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final ch = popular[index];
           return _PopularChannelCard(channel: ch);
@@ -348,6 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final popularNames = [
       'Real Madrid TV',
+      'M6',
       "L'Equipe",
       'Equidia',
       'BBC One',
@@ -355,7 +494,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'Alkass One',
       'Arryadia',
       'FTF Sports',
-      'beIN Sports XTRA',
       'Telemundo NY',
       'Gol Classics',
       'Canal+ Sport',
@@ -400,7 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
   }
 
-  Widget _buildCategories() {
+  Widget _buildCategories(ThemeData theme) {
     final provider = context.read<TvProvider>();
     final channels = provider.channels;
     final version = channels.length * 31 + channels.fold<int>(0, (sum, ch) => sum + (ch.category?.hashCode ?? 0));
@@ -433,14 +571,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // ───────── BANNIÈRE ─────────
-  Widget _buildBanner() {
+  Widget _buildBanner(ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+          gradient: LinearGradient(
+            colors: [theme.colorScheme.primary, theme.colorScheme.primary.withAlpha(200)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -448,21 +586,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            const Text(
-              'Welcome to ManKas TV',
+            Text(
+              AppStrings.of(context).welcomeTitle,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Watch the best free public IPTV channels from around the world.',
+              AppStrings.of(context).welcomeDesc,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withAlpha(200),
+                color: theme.colorScheme.onPrimary.withAlpha(200),
               ),
             ),
             const SizedBox(height: 16),
@@ -474,13 +612,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  'Discover channels',
+                child: Text(
+                  AppStrings.of(context).discoverChannels,
                   style: TextStyle(
-                    color: Color(0xFF4F46E5),
+                    color: theme.colorScheme.primary,
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
@@ -562,13 +700,15 @@ class _PillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF151525),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: color.withAlpha(60)),
           ),
@@ -580,8 +720,8 @@ class _PillButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   label,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),
@@ -603,16 +743,17 @@ class _MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final isLive = match.isLive;
 
     return Container(
       width: 200,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF151525),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isLive ? const Color(0xFFEF4444).withAlpha(100) : const Color(0xFF2A2A3E),
+          color: isLive ? theme.colorScheme.error.withAlpha(100) : theme.colorScheme.surfaceContainerHighest,
         ),
       ),
       child: Column(
@@ -624,19 +765,19 @@ class _MatchCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444),
+                    color: theme.colorScheme.error,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    'LIVE',
-                    style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+                  child: Text(
+                    AppStrings.of(context).live,
+                    style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
                   ),
                 )
               else
                 Text(
                   match.timePart,
                   style: TextStyle(
-                    color: Colors.white.withAlpha(150),
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -644,7 +785,7 @@ class _MatchCard extends StatelessWidget {
               const Spacer(),
               Text(
                 match.roundLabel,
-                style: TextStyle(color: Colors.white.withAlpha(100), fontSize: 10),
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 10),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -653,7 +794,7 @@ class _MatchCard extends StatelessWidget {
           const Spacer(),
           Text(
             match.homeTeamName,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+            style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -663,7 +804,7 @@ class _MatchCard extends StatelessWidget {
               Text(
                 isLive ? '${match.homeScore} - ${match.awayScore}' : 'vs',
                 style: TextStyle(
-                  color: isLive ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
+                  color: isLive ? theme.colorScheme.error : theme.colorScheme.primary,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
@@ -672,7 +813,7 @@ class _MatchCard extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   match.statusLabel,
-                  style: const TextStyle(color: Color(0xFFEF4444), fontSize: 10),
+                  style: TextStyle(color: theme.colorScheme.error, fontSize: 10),
                 ),
               ],
             ],
@@ -680,7 +821,7 @@ class _MatchCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             match.awayTeamName,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+            style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600, fontSize: 13),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -697,6 +838,7 @@ class _PopularChannelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final catColor = categoryColor(channel.category);
 
     return GestureDetector(
@@ -711,7 +853,7 @@ class _PopularChannelCard extends StatelessWidget {
         width: 90,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF151525),
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: catColor.withAlpha(40)),
         ),
@@ -733,7 +875,7 @@ class _PopularChannelCard extends StatelessWidget {
                         width: 44,
                         height: 44,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Icon(
+                        errorBuilder: (_c, _e, _s) => Icon(
                           categoryIcon(channel.category),
                           color: catColor,
                           size: 22,
@@ -748,8 +890,8 @@ class _PopularChannelCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
@@ -759,7 +901,6 @@ class _PopularChannelCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _CategoryCard extends StatelessWidget {
@@ -770,6 +911,8 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: () {
         final provider = context.read<TvProvider>();
@@ -782,7 +925,7 @@ class _CategoryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF151525),
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: data.color.withAlpha(40)),
         ),
@@ -793,8 +936,8 @@ class _CategoryCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               data.name,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
@@ -831,5 +974,3 @@ class _CountedCat {
 
   const _CountedCat({required this.cat, required this.count});
 }
-
-

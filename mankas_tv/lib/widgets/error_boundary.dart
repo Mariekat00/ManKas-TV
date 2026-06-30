@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_strings.dart';
+import 'animated_icons.dart';
 
 class ErrorBoundary extends StatelessWidget {
   final String? error;
@@ -22,7 +23,7 @@ class ErrorBoundary extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent, size: 48),
+              const ShakingIcon(icon: Icons.warning_amber_rounded, color: Colors.orangeAccent, size: 48),
               const SizedBox(height: 12),
               Text(
                 error!,

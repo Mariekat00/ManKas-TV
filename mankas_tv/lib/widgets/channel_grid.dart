@@ -5,6 +5,7 @@ import '../providers/tv_provider.dart';
 import '../utils/category_theme.dart';
 import '../utils/app_strings.dart';
 import '../screens/player_screen.dart';
+import '../core/widgets/app_state_page.dart';
 
 
 const int _pageSize = 50;
@@ -61,65 +62,64 @@ class _ChannelGridState extends State<ChannelGrid> {
     final isLoading = provider.isLoading;
 
     if (isLoading) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(color: Color(0xFF6366F1)),
-            const SizedBox(height: 16),
-            Text(AppStrings.of(context).loading, style: const TextStyle(color: Colors.white54)),
-          ],
-        ),
+      return AppStatePage(
+        icon: Icons.refresh_rounded,
+        title: AppStrings.of(context).loading,
+        description: AppStrings.of(context).loadingStream,
       );
     }
 
     if (channels.isEmpty) {
       final isSearch = provider.query.isNotEmpty;
       final isFav = provider.showFavoritesOnly;
-      final isCategory = provider.category != 'Tout';
-      final isCountry = provider.country != 'Tout';
-      String message;
+      final isCategory = provider.category != AppStrings.of(context).all;
+      final isCountry = provider.country != AppStrings.of(context).all;
+
+      String title;
+      String description;
+      IconData icon;
+      Color? iconColor;
+
       if (isSearch) {
-        message = 'No channels match "${provider.query}".';
+        title = AppStrings.of(context).noResults;
+        description = '${AppStrings.of(context).noResults} "${provider.query}".';
+        icon = Icons.search_off_rounded;
+        iconColor = Theme.of(context).colorScheme.primary;
       } else if (isFav) {
-        message = AppStrings.of(context).noFavorites;
+        title = AppStrings.of(context).favorites;
+        description = AppStrings.of(context).noFavorites;
+        icon = Icons.favorite_border_rounded;
+        iconColor = const Color(0xFFEC4899);
       } else if (isCategory || isCountry) {
-        message = 'No channels for this filter. Try another category or region.';
+        title = AppStrings.of(context).noResults;
+        description = AppStrings.of(context).noChannelsForFilter;
+        icon = Icons.filter_list_off_rounded;
+        iconColor = Theme.of(context).colorScheme.primary;
       } else {
-        message = AppStrings.of(context).noChannels;
+        title = AppStrings.of(context).liveTV;
+        description = AppStrings.of(context).noChannels;
+        icon = Icons.tv_off_rounded;
+        iconColor = Theme.of(context).colorScheme.error;
       }
+
       return RefreshIndicator(
         onRefresh: _onRefresh,
-        child: ListView(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.live_tv_outlined, size: 48, color: Colors.white24),
-                      const SizedBox(height: 16),
-                      Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white54, fontSize: 16)),
-                      if (isFav || isSearch || isCategory || isCountry) ...[
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () {
-                            provider.setQuery('');
-                            provider.setCategory('Tout');
-                            provider.setCountry('Tout');
-                            if (isFav) provider.toggleFavoritesOnly();
-                          },
-                          child: Text(AppStrings.of(context).resetFilters),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+        child: AppStatePage(
+          icon: icon,
+          iconColor: iconColor,
+          title: title,
+          description: description,
+          actions: [
+            if (isFav || isSearch || isCategory || isCountry)
+              AppStateAction(
+                label: AppStrings.of(context).resetFilters,
+                onPressed: () {
+                  provider.setQuery('');
+                  provider.setCategory(AppStrings.of(context).all);
+                  provider.setCountry(AppStrings.of(context).all);
+                  if (isFav) provider.toggleFavoritesOnly();
+                },
               ),
-            ),
           ],
         ),
       );
@@ -139,7 +139,7 @@ class _ChannelGridState extends State<ChannelGrid> {
           if (index == visibleChannels.length) {
             return const Padding(
               padding: EdgeInsets.all(16),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1))),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             );
           }
           final channel = visibleChannels[index];
@@ -157,7 +157,7 @@ class _ChannelGridState extends State<ChannelGrid> {
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A2E),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: color, width: 1),
               ),
@@ -167,7 +167,7 @@ class _ChannelGridState extends State<ChannelGrid> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF252540),
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(categoryIcon(channel.category), color: color, size: 24),
@@ -183,7 +183,6 @@ class _ChannelGridState extends State<ChannelGrid> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -195,8 +194,8 @@ class _ChannelGridState extends State<ChannelGrid> {
                               .join(' · '),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
@@ -204,14 +203,22 @@ class _ChannelGridState extends State<ChannelGrid> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(
-                    provider.isFavorite(channel.id)
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    size: 20,
-                    color: provider.isFavorite(channel.id)
-                        ? Colors.redAccent
-                        : Colors.white38,
+                  Semantics(
+                    label: provider.isFavorite(channel.id)
+                        ? AppStrings.of(context).removeFromFavorites
+                        : AppStrings.of(context).addToFavorites,
+                    child: IconButton(
+                      icon: Icon(
+                        provider.isFavorite(channel.id)
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        size: 20,
+                        color: provider.isFavorite(channel.id)
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      onPressed: () => provider.toggleFavorite(channel.id),
+                    ),
                   ),
                 ],
               ),

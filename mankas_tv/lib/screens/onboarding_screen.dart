@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/app_strings.dart';
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -12,27 +13,6 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _controller = PageController();
   int _page = 0;
-
-  static const _pages = [
-    _PageData(
-      icon: Icons.live_tv,
-      color: Color(0xFF6366F1),
-      title: 'Welcome to ManKas TV',
-      desc: 'Watch hundreds of free public IPTV channels from around the world.',
-    ),
-    _PageData(
-      icon: Icons.sports_soccer,
-      color: Color(0xFFEF4444),
-      title: 'Live Sports & Matches',
-      desc: 'Follow FIFA World Cup 2026, live scores, group standings, and match highlights.',
-    ),
-    _PageData(
-      icon: Icons.favorite,
-      color: Color(0xFFEC4899),
-      title: 'Favorites & Search',
-      desc: 'Save your favorite channels, search by name or country, and pick up where you left off.',
-    ),
-  ];
 
   @override
   void dispose() {
@@ -52,31 +32,60 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+    final strings = AppStrings.of(context);
+
+    final pages = [
+      _PageData(
+        icon: Icons.live_tv,
+        color: primary,
+        title: strings.onboardingTitle1,
+        desc: strings.onboardingDesc1,
+      ),
+      _PageData(
+        icon: Icons.sports_soccer,
+        color: const Color(0xFFEF4444),
+        title: strings.onboardingTitle2,
+        desc: strings.onboardingDesc2,
+      ),
+      _PageData(
+        icon: Icons.favorite,
+        color: const Color(0xFFEC4899),
+        title: strings.onboardingTitle3,
+        desc: strings.onboardingDesc3,
+      ),
+    ];
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D1A),
+      backgroundColor: scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (i) => setState(() => _page = i),
                 itemBuilder: (_, i) {
-                  final p = _pages[i];
+                  final p = pages[i];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: p.color.withAlpha(25),
-                            borderRadius: BorderRadius.circular(24),
+                        Semantics(
+                          label: p.title,
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: p.color.withAlpha(25),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: Icon(p.icon, color: p.color, size: 48),
                           ),
-                          child: Icon(p.icon, color: p.color, size: 48),
                         ),
                         const SizedBox(height: 32),
                         Text(
@@ -106,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (i) {
+              children: List.generate(pages.length, (i) {
                 final active = i == _page;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
@@ -114,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: active ? 24 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: active ? const Color(0xFF6366F1) : const Color(0xFF2A2A3E),
+                    color: active ? primary : theme.colorScheme.surface.withAlpha(178),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -128,24 +137,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: primary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: _page < _pages.length - 1
+                  onPressed: _page < pages.length - 1
                       ? () => _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut)
                       : _finish,
                   child: Text(
-                    _page < _pages.length - 1 ? 'Next' : 'Get Started',
+                    _page < pages.length - 1 ? strings.next : strings.getStarted,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            if (_page < _pages.length - 1)
+            if (_page < pages.length - 1)
               TextButton(
                 onPressed: _finish,
-                child: const Text('Skip', style: TextStyle(color: Colors.white38)),
+                child: Text(strings.skip, style: const TextStyle(color: Colors.white38)),
               ),
             const SizedBox(height: 32),
           ],

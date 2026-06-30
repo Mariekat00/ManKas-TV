@@ -41,6 +41,7 @@ const en: Dict = {
   "grid.charger": "Load more",
   "grid.no.match": "No channels match",
   "grid.no.favorites": "Favorite channels will appear here. Tap the heart icon on any channel to add it.",
+  "grid.no.recent": "Your recently watched channels will appear here.",
   "grid.no.category": "No channels in",
   "grid.no.available": "No channels available.",
   "grid.try.different": "Try a different category.",
@@ -69,17 +70,6 @@ const en: Dict = {
   "player.error.stream": "Stream failed to load. This channel may be offline or unavailable.",
   "player.retry": "Retry stream",
   "player.fullscreen": "Fullscreen",
-
-  // Live Matches
-  "live.title": "Live Matches",
-  "live.subtitle": "Live streams from StreamFree — football, UFC, basketball and more",
-  "live.refresh": "Refresh",
-  "live.loading": "Loading live matches...",
-  "live.empty": "No live matches",
-  "live.empty.desc": "Matches will appear here when they are live",
-  "live.error": "Unable to load live matches.",
-  "live.viewers": "viewers",
-  "live.live": "LIVE",
 
   // Football / World Cup
   "football.title": "FIFA World Cup 2026",
@@ -224,6 +214,7 @@ const fr: Dict = {
   "grid.charger": "Charger plus",
   "grid.no.match": "Aucune chaîne ne correspond à",
   "grid.no.favorites": "Les chaînes favorites apparaîtront ici. Appuyez sur l'icône cœur sur une chaîne pour l'ajouter.",
+  "grid.no.recent": "Vos chaînes récemment regardées apparaîtront ici.",
   "grid.no.category": "Aucune chaîne dans",
   "grid.no.available": "Aucune chaîne disponible.",
   "grid.try.different": "Essayez une catégorie différente.",
@@ -250,16 +241,6 @@ const fr: Dict = {
   "player.error.stream": "Échec du chargement du flux. Cette chaîne est peut-être hors ligne ou indisponible.",
   "player.retry": "Recharger",
   "player.fullscreen": "Plein écran",
-
-  "live.title": "Matchs en Direct",
-  "live.subtitle": "Streams live provenant de StreamFree — football, UFC, basketball et plus",
-  "live.refresh": "Actualiser",
-  "live.loading": "Chargement des matchs live...",
-  "live.empty": "Aucun match en direct",
-  "live.empty.desc": "Les matchs apparaissent ici quand ils sont live",
-  "live.error": "Impossible de charger les matchs live.",
-  "live.viewers": "spectateurs",
-  "live.live": "EN DIRECT",
 
   "football.title": "FIFA World Cup 2026",
   "football.subtitle": "Suivez la Coupe du Monde — groupes, classements et calendrier des matchs",

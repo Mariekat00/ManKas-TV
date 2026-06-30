@@ -1,7 +1,9 @@
 "use client";
 
 import Hls from "hls.js";
-import { Maximize2, RefreshCw, RadioTower, Volume2 } from "lucide-react";
+import { Maximize2, RefreshCw, Volume2 } from "lucide-react";
+import { SatelliteDishIcon } from "@/components/icons/satellite-dish";
+import { FrownIcon } from "@/components/icons/frown";
 import { useEffect, useRef, useState } from "react";
 import type { Channel } from "@/types";
 import { useTvStore } from "@/store/useTvStore";
@@ -233,15 +235,29 @@ export function VideoPlayer({ channel }: { channel: Channel | null }) {
             </>
           )
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-3 text-muted">
-            <RadioTower size={42} aria-hidden="true" />
-            <p className="text-sm">{t(locale, "player.select")}</p>
+          <div className="flex h-full flex-col items-center justify-center gap-4 text-muted">
+            <SatelliteDishIcon size={56} className="text-muted/50" aria-hidden="true" />
+            <div className="text-center">
+              <p className="text-sm font-medium">{t(locale, "player.select")}</p>
+              <p className="mt-1 text-xs text-muted/60">{t(locale, "player.waiting")}</p>
+            </div>
           </div>
         )}
 
         {error ? (
-          <div className="absolute inset-x-4 bottom-4 rounded-md border border-red-500/30 bg-red-950/80 p-3 text-sm text-red-100">
-            {error}
+          <div className="absolute inset-x-4 bottom-4 flex items-start gap-3 rounded-md border border-red-500/30 bg-red-950/90 p-4 text-sm text-red-100 backdrop-blur-sm">
+            <FrownIcon className="mt-0.5 shrink-0 size-5 text-red-400" />
+            <div className="flex-1">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => videoRef.current?.load()}
+                className="mt-2 flex items-center gap-1.5 text-xs text-red-300 underline hover:text-red-200"
+              >
+                <RefreshCw size={12} />
+                {t(locale, "player.retry")}
+              </button>
+            </div>
           </div>
         ) : null}
       </div>

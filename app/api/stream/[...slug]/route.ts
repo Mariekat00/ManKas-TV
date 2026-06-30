@@ -34,7 +34,6 @@ const ALLOWED_HOSTS = [
   "di-yx2saj20.vo.lswcdn.net",
   "di-g7ij0rwh.vo.lswcdn.net",
   "distribution.sportitalialive.it",
-  "streamfree.app",
   // ── IP addresses (keep as-is) ──
   "23.237.104.106",
   "80.194.62.172",

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">99.27.51.147</domain>
+        <domain includeSubdomains="true">cdn.haititivi.com</domain>
+    </domain-config>
+</network-security-config>

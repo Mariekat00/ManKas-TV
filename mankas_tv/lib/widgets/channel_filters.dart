@@ -10,66 +10,50 @@ class ChannelFilters extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<TvProvider>(
       builder: (context, provider, _) {
-        final categories = ['Tout', ...provider.categories.toList()..sort()];
-        final countries = ['Tout', ...provider.countries.toList()..sort()];
+        final theme = Theme.of(context);
+        final surface = theme.colorScheme.surface;
+        final allLabel = AppStrings.of(context).all;
+        final categories = [allLabel, ...provider.categories.toList()..sort()];
+        final countries = [allLabel, ...provider.countries.toList()..sort()];
 
-        final safeCategory = categories.contains(provider.category) ? provider.category : 'Tout';
-        final safeCountry = countries.contains(provider.country) ? provider.country : 'Tout';
+        final safeCategory = categories.contains(provider.category) ? provider.category : allLabel;
+        final safeCountry = countries.contains(provider.country) ? provider.country : allLabel;
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Search bar with recent searches
               _SearchField(provider: provider),
               const SizedBox(height: 10),
-              // Favorites toggle + Category + Country
               Row(
                 children: [
                   GestureDetector(
                     onTap: () => provider.toggleFavoritesOnly(),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: provider.showFavoritesOnly
-                            ? Colors.redAccent
-                            : const Color(0xFF2A2A3E),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            provider.showFavoritesOnly
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(AppStrings.of(context).favorites, style: const TextStyle(fontSize: 13, color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A3E),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                        child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: safeCategory,
-                          isDense: true,
-                          isExpanded: true,
-                          dropdownColor: const Color(0xFF2A2A3E),
-                          style: const TextStyle(fontSize: 12, color: Colors.white),
-                          items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis))).toList(),
-                          onChanged: (v) => provider.setCategory(v ?? 'Tout'),
+                    child: Semantics(
+                      label: AppStrings.of(context).favorites,
+                      button: true,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: provider.showFavoritesOnly
+                              ? Colors.redAccent
+                              : surface,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              provider.showFavoritesOnly
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(AppStrings.of(context).favorites, style: const TextStyle(fontSize: 13, color: Colors.white)),
+                          ],
                         ),
                       ),
                     ),
@@ -79,18 +63,39 @@ class ChannelFilters extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A3E),
+                        color: surface,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                        child: DropdownButtonHideUnderline(
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: safeCategory,
+                          isDense: true,
+                          isExpanded: true,
+                          dropdownColor: surface,
+                          style: const TextStyle(fontSize: 12, color: Colors.white),
+                          items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis))).toList(),
+                          onChanged: (v) => provider.setCategory(v ?? allLabel),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: safeCountry,
                           isDense: true,
                           isExpanded: true,
-                          dropdownColor: const Color(0xFF2A2A3E),
+                          dropdownColor: surface,
                           style: const TextStyle(fontSize: 12, color: Colors.white),
                           items: countries.map((c) => DropdownMenuItem(value: c, child: Text(c, overflow: TextOverflow.ellipsis))).toList(),
-                          onChanged: (v) => provider.setCountry(v ?? 'Tout'),
+                          onChanged: (v) => provider.setCountry(v ?? allLabel),
                         ),
                       ),
                     ),
@@ -146,6 +151,8 @@ class _SearchFieldState extends State<_SearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final surface = theme.colorScheme.surface;
     final recent = widget.provider.recentSearches;
     final filtered = recent.where((s) => s.contains(_controller.text)).toList();
 
@@ -183,9 +190,9 @@ class _SearchFieldState extends State<_SearchField> {
         if (_showSuggestions && filtered.isNotEmpty)
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E2E),
+              color: surface,
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
-              border: Border.all(color: const Color(0xFF2A2A3E)),
+              border: Border.all(color: theme.colorScheme.surface.withAlpha(178)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,

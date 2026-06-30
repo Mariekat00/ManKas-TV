@@ -45,7 +45,6 @@ export function AboutPage() {
       <Section title="Fonctionnalités principales">
         <ul className="grid gap-3 sm:grid-cols-2">
           <Feature icon="📺" text="Plus de 4500 chaînes IPTV publiques" />
-          <Feature icon="⚽" text="Matchs en direct via StreamFree" />
           <Feature icon="🏆" text="Suivi FIFA World Cup 2026" />
           <Feature icon="❤️" text="Système de favoris" />
           <Feature icon="🔍" text="Recherche par nom, pays, langue" />

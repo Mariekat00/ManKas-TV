@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -13,6 +14,17 @@ class NotificationService {
     await _plugin.initialize(
       const InitializationSettings(android: androidSettings, iOS: iosSettings),
     );
+    await _requestPermission();
+  }
+
+  Future<void> _requestPermission() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      await android?.requestNotificationsPermission();
+    } catch (e) {
+      debugPrint('NotificationService: permission request failed: $e');
+    }
   }
 
   Future<void> showMediaNotification({

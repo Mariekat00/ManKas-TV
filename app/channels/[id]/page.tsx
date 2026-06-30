@@ -11,27 +11,35 @@ type ChannelPageProps = {
 };
 
 export async function generateMetadata({ params }: ChannelPageProps) {
-  const { id } = await params;
-  const locale = await getServerLocale();
-  const channel = await getChannel(id);
+  try {
+    const { id } = await params;
+    const locale = await getServerLocale();
+    const channel = await getChannel(id);
 
-  if (!channel) {
+    if (!channel) {
+      return { title: "ManKas TV" };
+    }
+
+    return {
+      title: `${channel.name} - ManKas TV`,
+      description: `${t(locale, "channel.watch")} ${channel.name} ${t(locale, "live.live").toLowerCase()} ${t(locale, "nav.iptv").toLowerCase()}.`,
+    };
+  } catch {
     return { title: "ManKas TV" };
   }
-
-  return {
-    title: `${channel.name} - ManKas TV`,
-    description: `${t(locale, "channel.watch")} ${channel.name} ${t(locale, "live.live").toLowerCase()} ${t(locale, "nav.iptv").toLowerCase()}.`,
-  };
 }
 
 export default async function ChannelPage({ params }: ChannelPageProps) {
-  const { id } = await params;
-  const channel = await getChannel(id);
+  try {
+    const { id } = await params;
+    const channel = await getChannel(id);
 
-  if (!channel) {
+    if (!channel) {
+      notFound();
+    }
+
+    return <ChannelDetail channelId={id} />;
+  } catch {
     notFound();
   }
-
-  return <ChannelDetail channelId={id} />;
 }

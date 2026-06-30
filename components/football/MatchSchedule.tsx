@@ -5,6 +5,7 @@ import type { FootballMatch } from "@/types";
 import { MatchCard } from "./MatchCard";
 import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
+import { SatelliteDishIcon } from "@/components/icons/satellite-dish";
 
 type RoundFilter = "all" | "group" | "r32" | "r16" | "qf" | "sf" | "final";
 
@@ -105,7 +106,10 @@ export function MatchSchedule({ matches }: { matches: FootballMatch[] }) {
       )}
 
       {sortedMatches.length === 0 ? (
-        <p className="py-12 text-center text-muted">{t(locale, "football.no.matches.found")}</p>
+        <div className="flex flex-col items-center gap-3 py-12 text-muted">
+          <SatelliteDishIcon className="size-10 text-muted/40" />
+          <p>{t(locale, "football.no.matches.found")}</p>
+        </div>
       ) : (
         Object.entries(groupedByDate).map(([date, dateMatches]) => (
           <section key={date} className="mb-6">

@@ -5,7 +5,10 @@ import type { FootballMatch, FootballGroup, FootballTeam } from "@/types";
 import { MatchCard } from "./MatchCard";
 import { GroupStandings } from "./GroupStandings";
 import { MatchSchedule } from "./MatchSchedule";
-import { Trophy, Calendar, BarChart3, Loader2 } from "lucide-react";
+import { Trophy, Calendar, BarChart3 } from "lucide-react";
+import { LoaderIcon } from "@/components/icons/loader";
+import { FrownIcon } from "@/components/icons/frown";
+import { SatelliteDishIcon } from "@/components/icons/satellite-dish";
 import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
 
@@ -84,7 +87,7 @@ export function FootballPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-12 text-center">
-        <Loader2 size={32} className="mx-auto animate-spin text-muted" />
+        <LoaderIcon size={40} className="mx-auto text-muted" />
         <p className="mt-4 text-sm text-muted">{t(locale, "common.loading")}</p>
       </div>
     );
@@ -93,7 +96,10 @@ export function FootballPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-12 text-center">
-        <p className="text-muted">{error}</p>
+        <div className="flex flex-col items-center gap-3">
+          <FrownIcon className="size-10 text-muted/60" />
+          <p className="text-muted">{error}</p>
+        </div>
       </div>
     );
   }
@@ -140,7 +146,10 @@ export function FootballPage() {
               ))}
             </div>
           ) : (
-            <p className="py-12 text-center text-muted">{t(locale, "football.no.matches")}</p>
+            <div className="flex flex-col items-center gap-3 py-12 text-muted">
+              <SatelliteDishIcon className="size-10 text-muted/40" />
+              <p>{t(locale, "football.no.matches")}</p>
+            </div>
           )}
         </div>
       )}

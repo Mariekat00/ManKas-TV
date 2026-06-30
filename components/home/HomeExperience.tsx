@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Radio, Tv } from "lucide-react";
+import { Tv } from "lucide-react";
 import { ChannelFilters } from "@/components/channels/ChannelFilters";
 import { ChannelGrid } from "@/components/channels/ChannelGrid";
 import { RecentlyWatched } from "@/components/channels/RecentlyWatched";
@@ -34,15 +33,8 @@ export function HomeExperience() {
             </p>
           </div>
 
-          {/* Two main navigation buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <Link
-              href="/live"
-              className="flex flex-col items-center gap-2 rounded-xl bg-red-500 p-5 text-white transition hover:bg-red-600"
-            >
-              <Radio size={28} />
-              <span className="text-sm font-bold">{t(locale, "home.live")}</span>
-            </Link>
+          {/* Main navigation button */}
+          <div>
             <a
               href="#channels"
               className="flex flex-col items-center gap-2 rounded-xl bg-accent p-5 text-white transition hover:opacity-90"

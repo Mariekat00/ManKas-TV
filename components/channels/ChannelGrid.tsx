@@ -4,7 +4,10 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Heart, Play, RadioTower } from "lucide-react";
+import { Heart, Play } from "lucide-react";
+import { SearchIcon } from "@/components/icons/search";
+import { RadioTowerIcon } from "@/components/icons/radio-tower";
+import { FrownIcon } from "@/components/icons/frown";
 import { addFavorite, addWatchHistory, removeFavorite } from "@/services/channels";
 import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
@@ -34,8 +37,9 @@ export function ChannelGrid({
 
   if (error) {
     return (
-      <div className="rounded-md border border-border bg-panel p-6 text-sm text-muted">
-        {error}
+      <div className="flex flex-col items-center gap-3 rounded-md border border-red-500/30 bg-red-500/10 p-8 text-sm text-red-400">
+        <FrownIcon className="size-10" />
+        <p>{error}</p>
       </div>
     );
   }
@@ -52,9 +56,13 @@ export function ChannelGrid({
           ? `${t(locale, "grid.no.category")} "${cat}". ${t(locale, "grid.try.different")}`
           : t(locale, "grid.no.available");
     return (
-      <div className="flex flex-col items-center gap-3 rounded-md border border-border bg-panel p-8 text-sm text-muted">
-        <RadioTower className="size-10 opacity-40" />
-        <p>{message}</p>
+      <div className="flex flex-col items-center gap-3 rounded-md border border-border bg-panel p-8 text-center text-sm text-muted">
+        {q ? (
+          <SearchIcon className="size-12 text-muted/60" />
+        ) : (
+          <RadioTowerIcon className="size-12 text-muted/60" />
+        )}
+        <p className="max-w-xs">{message}</p>
         {(q || fav || cat !== "All") && (
           <button
             type="button"
@@ -63,7 +71,7 @@ export function ChannelGrid({
               useTvStore.getState().setCategory("All");
               if (fav) useTvStore.getState().toggleShowFavoritesOnly();
             }}
-            className="text-xs text-indigo-400 hover:underline"
+            className="mt-1 rounded-md border border-border bg-panel px-4 py-2 text-xs text-muted transition hover:border-accent hover:text-foreground"
           >
             {t(locale, "grid.reset")}
           </button>
@@ -140,7 +148,7 @@ const ChannelCard = React.memo(function ChannelCard({ channel }: { channel: Chan
             />
           ) : (
             <div className="flex h-full items-center justify-center text-muted">
-              <RadioTower size={34} aria-hidden="true" />
+              <RadioTowerIcon size={34} aria-hidden="true" />
             </div>
           )}
           <span className="absolute bottom-2 right-2 flex size-9 items-center justify-center rounded-md bg-accent text-white opacity-0 transition group-hover:opacity-100">

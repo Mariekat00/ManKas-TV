@@ -93,12 +93,10 @@ export async function getChannels() {
   return channelCache.data;
 }
 
-export async function getChannel(id: string) {
+export async function getChannel(id: string): Promise<Channel | null> {
   if (!isSupabaseConfigured()) {
     const channels = await getChannels();
-    const channel = channels.find((ch) => ch.id === id);
-    if (!channel) throw new Error("Channel not found.");
-    return channel;
+    return channels.find((ch) => ch.id === id) ?? null;
   }
 
   try {
@@ -107,18 +105,14 @@ export async function getChannel(id: string) {
 
     if (error || !data) {
       const channels = await getChannels();
-      const channel = channels.find((ch) => ch.id === id);
-      if (!channel) throw new Error("Channel not found.");
-      return channel;
+      return channels.find((ch) => ch.id === id) ?? null;
     }
 
     return data;
   } catch (e) {
     console.warn("getChannel supabase query failed:", e);
     const channels = await getChannels();
-    const channel = channels.find((ch) => ch.id === id);
-    if (!channel) throw new Error("Channel not found.");
-    return channel;
+    return channels.find((ch) => ch.id === id) ?? null;
   }
 }
 

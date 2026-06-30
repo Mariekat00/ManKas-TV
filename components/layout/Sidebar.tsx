@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Clock3, Heart, Home, Info, PlusCircle, Radio, Tv, Trophy, X } from "lucide-react";
+import { Clock3, Heart, Home, Info, PlusCircle, Tv, Trophy, X } from "lucide-react";
 import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
 
@@ -12,7 +12,6 @@ export function Sidebar() {
 
   const navItems = [
     { href: "/", labelKey: "nav.home", icon: Home },
-    { href: "/live", labelKey: "nav.live", icon: Radio },
     { href: "/football", labelKey: "nav.worldcup", icon: Trophy },
     { href: "/#channels", labelKey: "nav.iptv", icon: Tv },
     { href: "/#favorites", labelKey: "nav.favorites", icon: Heart },

@@ -17,8 +17,9 @@ class IptvScreen extends StatefulWidget {
 class _IptvScreenState extends State<IptvScreen> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF11111B),
+      backgroundColor: theme.colorScheme.surface,
       body: Column(
         children: [
           SafeArea(
@@ -28,7 +29,7 @@ class _IptvScreenState extends State<IptvScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Text(
@@ -40,11 +41,11 @@ class _IptvScreenState extends State<IptvScreen> {
                     builder: (context, provider, _) {
                       return Row(
                         children: [
-                          _metric(AppStrings.of(context).liveTV, provider.channels.length),
+                          _metric(AppStrings.of(context).liveTV, provider.channels.length, theme),
                           const SizedBox(width: 6),
-                          _metric(AppStrings.of(context).countries, provider.countries.length),
+                          _metric(AppStrings.of(context).countries, provider.countries.length, theme),
                           const SizedBox(width: 6),
-                          _metric(AppStrings.of(context).categories, provider.categories.length),
+                          _metric(AppStrings.of(context).categories, provider.categories.length, theme),
                           const SizedBox(width: 8),
                           const NetworkQualityIndicator(),
                         ],
@@ -65,22 +66,22 @@ class _IptvScreenState extends State<IptvScreen> {
     );
   }
 
-  Widget _metric(String label, int value) {
+  Widget _metric(String label, int value, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2E),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
           Text(
             '$value',
-            style: const TextStyle(fontFamily: 'monospace', fontSize: 16, fontWeight: FontWeight.w700),
+            style: TextStyle(fontFamily: 'monospace', fontSize: 16, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
           ),
           Text(
             label.toUpperCase(),
-            style: const TextStyle(fontSize: 8, letterSpacing: 1, color: Colors.white54),
+            style: TextStyle(fontSize: 8, letterSpacing: 1, color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
       ),

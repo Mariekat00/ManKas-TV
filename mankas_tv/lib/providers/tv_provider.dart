@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/channel.dart';
 import '../services/channel_service.dart';
-import '../services/streamfree_service.dart';
 
 class TvProvider extends ChangeNotifier {
   final ChannelService _service;
 
   List<Channel> _channels = [];
   List<Channel> _filteredChannels = [];
-  List<Channel> _streamFreeChannels = [];
   List<String> _favorites = [];
   List<String> _recentSearches = [];
   Channel? _selectedChannel;
@@ -17,7 +15,6 @@ class TvProvider extends ChangeNotifier {
   String _country = 'Tout';
   bool _showFavoritesOnly = false;
   bool _isLoading = true;
-  bool _isLoadingStreamFree = false;
 
   static const _maxRecentSearches = 5;
 
@@ -25,7 +22,6 @@ class TvProvider extends ChangeNotifier {
 
   List<Channel> get channels => _channels;
   List<Channel> get filteredChannels => _filteredChannels;
-  List<Channel> get streamFreeChannels => _streamFreeChannels;
   List<String> get favorites => _favorites;
   List<String> get recentSearches => _recentSearches;
   Channel? get selectedChannel => _selectedChannel;
@@ -34,7 +30,6 @@ class TvProvider extends ChangeNotifier {
   String get country => _country;
   bool get showFavoritesOnly => _showFavoritesOnly;
   bool get isLoading => _isLoading;
-  bool get isLoadingStreamFree => _isLoadingStreamFree;
 
   Set<String> get categories => _channels.map((c) => c.category ?? 'Général').toSet();
   Set<String> get countries => _channels.map((c) => c.country ?? 'Inconnu').toSet();
@@ -68,16 +63,6 @@ class TvProvider extends ChangeNotifier {
     }
 
     _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> loadStreamFree() async {
-    _isLoadingStreamFree = true;
-    notifyListeners();
-
-    _streamFreeChannels = await StreamFreeService.fetchLiveStreams();
-
-    _isLoadingStreamFree = false;
     notifyListeners();
   }
 
