@@ -1,5 +1,3 @@
-"use client";
-
 export type Locale = "en" | "fr";
 
 type Dict = Record<string, string>;

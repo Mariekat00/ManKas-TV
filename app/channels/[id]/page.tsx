@@ -30,16 +30,18 @@ export async function generateMetadata({ params }: ChannelPageProps) {
 }
 
 export default async function ChannelPage({ params }: ChannelPageProps) {
+  const { id } = await params;
+
+  let channel;
   try {
-    const { id } = await params;
-    const channel = await getChannel(id);
-
-    if (!channel) {
-      notFound();
-    }
-
-    return <ChannelDetail channelId={id} />;
+    channel = await getChannel(id);
   } catch {
     notFound();
   }
+
+  if (!channel) {
+    notFound();
+  }
+
+  return <ChannelDetail channelId={id} initialChannel={channel} />;
 }

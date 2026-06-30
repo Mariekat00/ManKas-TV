@@ -72,18 +72,22 @@ export async function getChannels() {
     return channelCache.data;
   }
 
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("channels")
-    .select("*")
-    .order("name", { ascending: true });
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from("channels")
+      .select("*")
+      .order("name", { ascending: true });
 
-  if (!error && data && data.length > 0) {
-    channelCache = {
-      expiresAt: Date.now() + CHANNEL_CACHE_TTL,
-      data: data,
-    };
-    return channelCache.data;
+    if (!error && data && data.length > 0) {
+      channelCache = {
+        expiresAt: Date.now() + CHANNEL_CACHE_TTL,
+        data: data,
+      };
+      return channelCache.data;
+    }
+  } catch (e) {
+    console.warn("getChannels supabase query failed:", e);
   }
 
   channelCache = {
@@ -94,25 +98,28 @@ export async function getChannels() {
 }
 
 export async function getChannel(id: string): Promise<Channel | null> {
-  if (!isSupabaseConfigured()) {
-    const channels = await getChannels();
-    return channels.find((ch) => ch.id === id) ?? null;
-  }
+  const channels = await getChannels();
+  const local = channels.find((ch) => ch.id === id);
+  if (local) return local;
+
+  if (!isSupabaseConfigured()) return null;
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase.from("channels").select("*").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("channels")
+      .select("*")
+      .eq("id", id)
+      .single();
+    clearTimeout(timeoutId);
 
-    if (error || !data) {
-      const channels = await getChannels();
-      return channels.find((ch) => ch.id === id) ?? null;
-    }
-
-    return data;
+    if (!error && data) return data;
+    return null;
   } catch (e) {
     console.warn("getChannel supabase query failed:", e);
-    const channels = await getChannels();
-    return channels.find((ch) => ch.id === id) ?? null;
+    return null;
   }
 }
 

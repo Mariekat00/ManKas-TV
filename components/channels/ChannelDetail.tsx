@@ -9,8 +9,14 @@ import { useTvStore } from "@/store/useTvStore";
 import { t } from "@/lib/translations";
 import type { Channel } from "@/types";
 
-export function ChannelDetail({ channelId }: { channelId: string }) {
-  const [channel, setChannel] = useState<Channel | null>(null);
+export function ChannelDetail({
+  channelId,
+  initialChannel,
+}: {
+  channelId: string;
+  initialChannel?: Channel | null;
+}) {
+  const [channel, setChannel] = useState<Channel | null>(initialChannel ?? null);
   const [error, setError] = useState<string | null>(null);
   const setSelectedChannel = useTvStore((state) => state.setSelectedChannel);
   const favorites = useTvStore((state) => state.favorites);
@@ -24,7 +30,7 @@ export function ChannelDetail({ channelId }: { channelId: string }) {
 
     getChannel(channelId)
       .then((data) => {
-        if (isMounted) {
+        if (isMounted && data) {
           setChannel(data);
           setSelectedChannel(data);
           void addWatchHistory(data.id).catch(() => undefined);
